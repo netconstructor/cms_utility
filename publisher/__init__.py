@@ -49,11 +49,15 @@ def process_file(post_file, local=0):
 def text_file(post_file, file_name, local=0):
     if local:
         post_file = open(file_name, 'r')
-        
-    title = post_file.readline()
-    description = ''
-    for chunk in post_file.readlines():
-        description += chunk 
+        title = post_file.readline()
+        description = ''
+        for chunk in post_file.readlines():
+            description += chunk
+    else:
+        title = post_file.readlines()[0]
+        description = ''
+        for chunk in post_file.readlines()[1:]:
+            description += chunk
     description += '\n\nSource: %s' % os.path.basename(file_name)
 
     if local:
