@@ -1,0 +1,73 @@
+* {
+    font-family: Arial, "MS Trebuchet", sans-serif;
+    font-size: 18px;
+    
+}
+
+a:visited, a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: black;
+}
+
+#body {
+    border: 1px solid #999;
+    margin: auto;
+    width: 750px;
+    min-height: 600px;
+    background-color: #A77946;
+}
+
+#header {
+    text-align: center;
+    margin: 5px 0px;
+    font: 30px "Arial Black";
+    color: #D6D6D6;
+}
+
+#header a, #header a:visited { 
+    font: 30px "Arial Black";
+    color: #D6D6D6;
+    
+}
+
+#header a:hover {
+    color: black;
+}
+
+#sub-header {
+    background-color: #D6D6D6;
+    width: 100%;
+    margin: 2px 0;
+    padding: 0;
+    font-size: 18px;
+}
+
+#sub-header ul {
+    background-color: #DDD;
+    height: 22px;
+}
+
+#sub-header li {
+    list-style-type: none;
+    float: right;
+    width: 30%;
+}
+
+#content {
+    margin: 25px;
+}
+
+#qmark {
+    width: 300px;
+    margin: 150px 215px;
+    text-align: center;
+}
+
+#settings {
+    margin: 20px 100px;
+}

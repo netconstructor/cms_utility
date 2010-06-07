@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}CMS Upload Utility: Settings{% endblock %}
+
+{% block content %}
+<div id="settings">
+{% if message %}
+<div id="message">
+    {{ message }}
+</div>
+{% endif %}
+
+{% if not config %}
+<div id="retrieve_settings" class="formset">
+<form method="POST" action="{{ settings.ROOT_URL }}settings/get/">
+<strong>Retrieve Settings:</strong><br/>
+<label for="id_cms_email">E-mail Address:</label>
+<input type="text" name="cms_email" id="id_cms_email"/>
+<input type="submit" value="Get"/>
+</form>
+</div>
+
+<p><strong>-- OR --</strong></p>
+
+<div id="set_settings" class="formset">
+    <strong>Save Settings:</strong><br/>
+<form method="POST" action="">
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Save Settings">
+</form>
+</div>
+{% else %}
+<p><strong>{{ config.email }}</strong></p>
+CMS Type: {{ config.get_cms_type_display }} <br/>
+CMS URL: {{ config.cms_url }}<br/>
+CMS User: {{ config.cms_user }}<br/>
+CMS Pass: {{ config.cms_pass }}<br/>
+<br/>
+<a href="{{ settings.ROOT_URL }}settings/clear/">Clear Settings</a>
+{% endif %}
+</div>
+{% endblock %}

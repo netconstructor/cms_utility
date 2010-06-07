@@ -1,0 +1,1 @@
+[{"pk": 4, "model": "publisher.settings", "fields": {"cms_url": "http://localhost/~donk/wordpress/xmlrpc.php", "cms_type": "WP", "cms_user": "admin", "email": "don@kukral.org", "cms_pass": "admin"}}]

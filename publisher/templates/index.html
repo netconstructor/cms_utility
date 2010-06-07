@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="qmark">
+{% if not config %}
+<img src="/media/img/red-qmark.png"/>
+<br/>
+No settings found.
+<br/>
+<a href="{{ settings.ROOT_URL }}settings/">Click to update settings.</a>
+{% else %}
+Profile loaded successfully for:
+<br/>
+{{ config.email }}
+<br/>
+<a href="{{ settings.ROOT_URL }}settings/">Click to update settings.</a>
+{% endif %}
+</div>
+{% endblock %}
