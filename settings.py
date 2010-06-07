@@ -8,6 +8,9 @@ TEMPLATE_DEBUG = DEBUG
 ROOT_PATH = os.path.dirname(__file__)
 ROOT_URL = 'http://localhost:8000/'
 
+if gethostname() == 'www3.news-apps.com':
+    ROOT_URL = 'http://apps.joeboydston.com/cms_utility/'
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
@@ -45,7 +48,7 @@ MEDIA_ROOT = ROOT_PATH+'/media/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = ROOT_URL + 'media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
