@@ -29,44 +29,75 @@ def delete_settings(email):
     except models.Settings.DoesNotExist:
         pass    
         
-def process_file(post_file, local=0):
-    if local:
+def process_file(post_file, layout='default', is_zipfile=False):
+    if is_zipfile:
         file_name = post_file
         post_file = None
     else:
         file_name = post_file.name
     
     if (file_name.endswith('.txt')):
-        (title, description) = text_file(post_file, file_name, local)
+        data = text_file(post_file, file_name, is_zipfile)
     elif (file_name.endswith('.doc')):
-        (title, description) = word_file(post_file, file_name, local)
+        data = word_file(post_file, file_name, is_zipfile)
     elif (file_name.endswith('.rtf')):
-        (title, description) = rtf_file(post_file, file_name, local)
+        data = rtf_file(post_file, file_name, is_zipfile)
     else: 
-        title = descripiton = None
+        data = None
+    
+    (title, description) = parse_file(data, file_name, layout)
+    return (title, description)
+    
+def parse_file(data, file_name, layout):
+    if not data:
+        title = description = None
+    elif layout == '1':
+        title = data[0]
+        description = "".join(data[4:])
+        description += 'Author: ' + data[1]
+        description += 'Pub Date: ' + data[2]
+        description += 'Source: ' + data[3]
+    elif layout == '2':
+        title = data[0]
+        description = "".join(data[3:])
+        description += 'Author: ' + data[1]
+        description += 'Source: ' + data[2]
+    elif layout == '3':
+        title = os.path.basename(file_name)
+        for ext in ['.txt', '.doc', '.rtf']:
+            title = title.rstrip(ext)
+        description = "".join(data[3:])
+        description += 'Author: ' + data[0]
+        description += 'Pub Date: ' + data[1]
+        description += 'Source: ' + data[2]
+    elif layout == '4':
+        title = os.path.basename(file_name)
+        for ext in ['.txt', '.doc', '.rtf']:
+            title = title.rstrip(ext)
+        description = "".join(data[2:])
+        description += 'Byline: ' + data[0]
+        description += 'Source: ' + data[1]
+    else: # default 
+        title = data[0]
+        description = "".join(data[1:])
+    
     return (title, description)
 
-def text_file(post_file, file_name, local=0):
-    if local:
+def text_file(post_file, file_name, is_zipfile=False):
+    if is_zipfile:
         post_file = open(file_name, 'r')
-        title = post_file.readline()
-        description = ''
-        for chunk in post_file.readlines():
-            description += chunk
+        lines = post_file.readlines()
+        post_file.close()
     else:
-        title = post_file.readlines()[0]
-        description = ''
-        for chunk in post_file.readlines()[1:]:
-            description += chunk
-    description += '\n\nSource: %s' % os.path.basename(file_name)
+        lines = post_file.readlines()
 
-    if local:
+    if is_zipfile:
         os.unlink(file_name)
         
-    return (title, description)
+    return lines
 
-def word_file(post_file, file_name, local=0):
-    if local:
+def word_file(post_file, file_name, is_zipfile=False):
+    if is_zipfile:
         tmp_file_name = file_name
     else:
         tmp_file_name = settings.TEMP_FILES + '/' + file_name
@@ -77,19 +108,17 @@ def word_file(post_file, file_name, local=0):
         
     command = settings.ANTIWORD + " \"" + tmp_file_name + "\""
     lines = os.popen(command).read().split('\n\n')
-
-    title = lines[0].strip('\n')
-    description = ''
-    for chunk in lines[1:]:
-        description += chunk
-    description += '\n\nSource: %s' % os.path.basename(file_name)
+    
+    tmp_list = []
+    for line in lines[0].lstrip('\n').split('\n'):
+        tmp_list.append(line + '\n')
 
     os.unlink(tmp_file_name)    
 
-    return (title, description)
+    return tmp_list
 
-def rtf_file(post_file, file_name, local=0):
-    if local:
+def rtf_file(post_file, file_name, is_zipfile=False):
+    if is_zipfile:
         tmp_file_name = file_name
     else:
         tmp_file_name = settings.TEMP_FILES + '/' + file_name
@@ -101,18 +130,14 @@ def rtf_file(post_file, file_name, local=0):
     command = settings.UNRTF + " -t text \"" + tmp_file_name + "\" 2> /dev/null"
     data = os.popen(command).read()
     lines = data.split('-----------------')[1].split('\n')[1:]
-
-    title = lines[0]
-    description = ''
-    for chunk in lines[1:]:
-        if chunk == '': 
-            chunk = '\n'
-        description += chunk
-    description += '\n\nSource: %s' % os.path.basename(file_name)
-
+    
+    tmp_list = []
+    for line in lines:
+        tmp_list.append(line + '\n')
+        
     os.unlink(tmp_file_name)    
 
-    return (title, description)
+    return tmp_list
     
 def process_zip_file(post_file):
     file_name = post_file.name
@@ -135,7 +160,7 @@ def process_zip_file(post_file):
         outfile.flush()
         outfile.close()
             
-        (title, description) = process_file(extracted_name, local=1)
+        (title, description) = process_file(extracted_name, is_zipfile=True)
         posts.append({'title': title, 'description': description})
         
     os.unlink(tmp_file_name)
