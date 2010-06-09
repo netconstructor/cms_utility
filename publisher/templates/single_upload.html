@@ -10,6 +10,13 @@
         <li class="bold"><a href="{{ settings.ROOT_URL }}single_upload/">Single Upload</a></li>
     </ul>
 </div>
+
+<div id="type-header">
+    <ul>
+        <li><a href="{{ settings.ROOT_URL }}single_upload/file_info/">Use File Info</a></li>
+        <li class="bold"><a href="{{ settings.ROOT_URL }}single_upload/">My Settings</a></li>
+    </ul>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -62,6 +69,7 @@
         <label for="id_date">Pub Date:</label>
         <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
     </div>
+    <input type="hidden" name="layout" value="{{ layout }}"/>
     <input type="submit" value="Upload File"/>
 </form>
 {% endif %}
