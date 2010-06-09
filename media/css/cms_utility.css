@@ -71,3 +71,7 @@ a:hover {
 #settings {
     margin: 20px 100px;
 }
+
+.bold {
+    font-weight: bold;
+}

@@ -14,7 +14,7 @@
     <div id="header">
         <a href="{{ settings.ROOT_URL }}">CMS UPLOAD UTILITY</a>
     </div>
-    
+    {% block subheader %}
     <div id="sub-header">
         <ul>
             <li><a href="{{ settings.ROOT_URL }}settings/">Settings</a></li>
@@ -22,6 +22,7 @@
             <li><a href="{{ settings.ROOT_URL }}single_upload/">Single Upload</a></li>
         </ul>
     </div>
+    {% endblock %}
     <div id="content">
         {% block content %}{% endblock %}
     </div>
