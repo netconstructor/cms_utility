@@ -51,7 +51,7 @@
     <div class="fieldWrapper">
         {{ form.date.errors }}
         <label for="id_date">Pub Date:</label>
-        <input id="date" name="date" type="text" /> 
+        <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
     </div>
     <input type="submit" value="Upload File"/>
 </form>
