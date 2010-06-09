@@ -11,7 +11,8 @@ class SingleUploadForm(forms.Form):
     status = forms.CharField()
     date = forms.DateTimeField()
     tags = forms.CharField()
-    
+    layout = forms.CharField()
+ 
 class ZipUploadForm(forms.Form):
     post_file = forms.FileField()
     category = forms.CharField()
