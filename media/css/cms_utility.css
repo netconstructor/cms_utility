@@ -58,6 +58,17 @@ a:hover {
     width: 30%;
 }
 
+#type-header ul {
+    background-color: #DDD;
+    height: 22px;
+}
+
+#type-header li {
+    list-style-type: none;
+    float: right;
+    width: 30%;
+}
+
 #content {
     margin: 25px;
 }
