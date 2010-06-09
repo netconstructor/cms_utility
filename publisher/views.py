@@ -7,8 +7,8 @@ from django.views.generic.simple import direct_to_template
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
-from models import Settings
-from forms import SettingsForm, SingleUploadForm, ZipUploadForm
+from models import Settings, LAYOUTS
+from forms import SingleUploadForm, ZipUploadForm, SettingsForm
 from publisher import *
 
 def index(request):
@@ -77,7 +77,9 @@ def single_upload(request):
                 
                 rv = blog.new_post(post)
                 post = blog.get_post(rv)
-                
+            else:
+                print 'bad form!'
+                print form.errors                
         else:
             form = SingleUploadForm()
             post = None
@@ -86,7 +88,8 @@ def single_upload(request):
         
     return direct_to_template(request, 'single_upload.html', 
         {'config': config, 'categories': categories,
-        'form': form, 'post': post, 'pub_date': pub_date, })
+        'form': form, 'post': post, 'pub_date': pub_date, 
+        'layout': 'default', })
     
 def batch_upload(request):
     post = form = categories = pub_date = rv_posts = None
@@ -129,3 +132,42 @@ def batch_upload(request):
     return direct_to_template(request, 'batch_upload.html', 
         {'config': config, 'categories': categories,
         'form': form, 'posts': rv_posts, 'pub_date': pub_date, })
+        
+def single_upload_file_info(request):
+    post = form = categories = pub_date = None
+    config = lookup_settings(request)
+    
+    if config: 
+        blog = pyblog.WordPress(config.cms_url, config.cms_user, 
+                config.cms_pass)
+        categories = blog.get_categories()
+        if request.method == 'POST':
+            form = SingleUploadForm(request.POST, request.FILES)
+            file_name = None
+            if form.is_valid():
+                post_file = form.cleaned_data['post_file']
+                layout = form.cleaned_data['layout']
+                (title, description) = process_file(post_file, layout)
+                
+                pub_date = form.cleaned_data['date']
+                date_created = xmlrpclib.DateTime(
+                    time.mktime(pub_date.timetuple()))
+                tags = form.cleaned_data['tags']
+                category = form.cleaned_data['category']
+                
+                post = {'title': title, 'description': description,
+                'mt_keywords': tags, 'categories': [category], 
+                'dateCreated': date_created, }
+                
+                rv = blog.new_post(post)
+                post = blog.get_post(rv)
+        else:
+            form = SingleUploadForm()
+            post = None
+    else:
+        post = form = categories = pub_date = None
+        
+    return direct_to_template(request, 'single_upload_file_info.html', 
+        {'config': config, 'categories': categories,
+        'form': form, 'post': post, 'pub_date': pub_date, 
+        'layouts': LAYOUTS})
