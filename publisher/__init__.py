@@ -98,7 +98,7 @@ def rtf_file(post_file, file_name, local=0):
             tmp_file.write(chunk)
         tmp_file.close()
 
-    command = settings.UNRTF + " -t text \"" + tmp_file_name + "\""
+    command = settings.UNRTF + " -t text \"" + tmp_file_name + "\" 2> /dev/null"
     data = os.popen(command).read()
     lines = data.split('-----------------')[1].split('\n')[1:]
 
@@ -124,16 +124,20 @@ def process_zip_file(post_file):
         tmp_file.write(chunk)
     tmp_file.close()
     
+    posts = []
     zip_file = open(tmp_file_name, 'r')
     cms_zipfile = zipfile.ZipFile(zip_file)
-    cms_zipfile.extractall(path=directory)
-    
-    posts = []
-    for zfile in cms_zipfile.filelist:
-        filename = directory + '/' + zfile.filename
-        (title, description) = process_file(filename, local=1)
+    for info in cms_zipfile.infolist():
+        extracted_name = directory + '/' + info.filename
+        data = cms_zipfile.read(info.filename)
+        outfile = open(extracted_name, 'w')
+        outfile.write(data)
+        outfile.flush()
+        outfile.close()
+            
+        (title, description) = process_file(extracted_name, local=1)
         posts.append({'title': title, 'description': description})
-    
+        
     os.unlink(tmp_file_name)
     os.rmdir(directory)
     
