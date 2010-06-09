@@ -1,5 +1,26 @@
 from django.db import models
 
+LAYOUTS = (
+    ('1', """Line 1: Headline
+Line 2: Author
+Line 3: Pub Date
+Line 4: Source
+Line 5: Begin Story"""),
+    ('2', """Line 1: Headline
+Line 2: Author
+Line 3: Source
+Line 4: Begin Story"""),
+    ('3', """File Name: Headline
+Line 1: Author
+Line 2: Pub Date
+Line 3: Source
+Line 4: Begin Story"""),
+    ('4', """File Name: Headline
+Line 1: Byline
+Line 2: Source
+Line 3: Begin Story""")
+)
+
 # Create your models here.
 class Settings(models.Model):
     CMS_CHOICES = (('WP', 'Wordpress'),)
