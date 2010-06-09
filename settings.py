@@ -1,15 +1,10 @@
 # Django settings for cms_utility project.
 import os
 from socket import gethostname
+from localsettings import *
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
-ROOT_PATH = os.path.dirname(__file__)
-ROOT_URL = 'http://localhost:8000/'
-
-if gethostname() == 'www3.news-apps.com':
-    ROOT_URL = 'http://apps.joeboydston.com/cms_utility/'
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -98,7 +93,3 @@ INSTALLED_APPS = (
     'cms_utility.publisher',
 )
 
-ANTIWORD = '/opt/local/bin/antiword'
-UNRTF = '/opt/local/bin/unrtf --text'
-
-TEMP_FILES = ROOT_PATH + '/temp_files'
