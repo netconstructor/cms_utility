@@ -1,0 +1,19 @@
+CMS Utility
+
+The CMS Utility allows you to upload single or zip files and post the contents
+ to Wordpress and eventually other CMS systems.
+ 
+To install download and configure the dependencies below and edit the 
+localsettings.py file.
+
+After you have finished that, go to the project directory and run:
+
+    python manage.py runserver
+
+
+Dependencies: 
+* Python >= 2.5 (http://www.python.org/)
+* Django >= v1.0 (http://www.djangoproject.com/)
+* Python Blogger = v1.0 (http://code.google.com/p/python-blogger/)
+* Antiword (http://www.winfield.demon.nl/)
+* unrtf (http://www.gnu.org/software/unrtf/unrtf.html)
