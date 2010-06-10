@@ -21,6 +21,11 @@ Line 2: Source
 Line 3: Begin Story""")
 )
 
+DIR_STRUCTURES = (
+    ('default', 'Single Folder'),
+    ('1', """TOP DIRECTORY -> MAIN CATEGORY""")
+)
+
 # Create your models here.
 class Settings(models.Model):
     CMS_CHOICES = (('WP', 'Wordpress'),)
