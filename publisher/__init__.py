@@ -139,7 +139,7 @@ def rtf_file(post_file, file_name, is_zipfile=False):
 
     return tmp_list
     
-def process_zip_file(post_file):
+def process_zip_file(post_file, layout="default", dir_structure='default'):
     file_name = post_file.name
     directory = tempfile.mkdtemp(dir=settings.TEMP_FILES)
     
@@ -150,20 +150,34 @@ def process_zip_file(post_file):
     tmp_file.close()
     
     posts = []
+    dirs = []
     zip_file = open(tmp_file_name, 'r')
     cms_zipfile = zipfile.ZipFile(zip_file)
     for info in cms_zipfile.infolist():
-        extracted_name = directory + '/' + info.filename
-        data = cms_zipfile.read(info.filename)
-        outfile = open(extracted_name, 'w')
-        outfile.write(data)
-        outfile.flush()
-        outfile.close()
+        if info.filename.endswith('/'):
+            os.mkdir(directory + '/' + info.filename)
+            dirs.append(directory + '/' + info.filename)
+        else:
+            extracted_name = directory + '/' + info.filename
+            outfile = open(extracted_name, 'w')
+            outfile.write(cms_zipfile.read(info.filename))
+            outfile.flush()
+            outfile.close()
             
-        (title, description) = process_file(extracted_name, is_zipfile=True)
-        posts.append({'title': title, 'description': description})
-        
+
+            (title, description) = process_file(extracted_name, layout, 
+                is_zipfile=True)
+
+            if dir_structure == '1':
+                category = info.filename.split(os.path.sep)[0]
+                posts.append({'title': title, 'description': description, 
+                    'category': category})
+            else:
+                posts.append({'title': title, 'description': description})
+                
     os.unlink(tmp_file_name)
+    for d in dirs:
+        os.rmdir(d)
     os.rmdir(directory)
     
     return posts
