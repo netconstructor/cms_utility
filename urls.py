@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     (r'^single_upload/$', 'publisher.views.single_upload'),
     (r'^single_upload/file_info/$', 'publisher.views.single_upload_file_info'),
     (r'^batch_upload/$', 'publisher.views.batch_upload'),
+    (r'^batch_upload/hierarchy/$', 'publisher.views.batch_upload_hierarchy'),
     
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT}),
