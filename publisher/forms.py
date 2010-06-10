@@ -5,18 +5,12 @@ class SettingsForm(forms.ModelForm):
     class Meta:
         model = Settings
         
-class SingleUploadForm(forms.Form):
+class FileUploadForm(forms.Form):
     post_file = forms.FileField()
     category = forms.CharField()
     status = forms.CharField()
     date = forms.DateTimeField()
     tags = forms.CharField()
     layout = forms.CharField()
- 
-class ZipUploadForm(forms.Form):
-    post_file = forms.FileField()
-    category = forms.CharField()
-    status = forms.CharField()
-    date = forms.DateTimeField()
-    tags = forms.CharField()
+    dir_structure = forms.CharField()
     
