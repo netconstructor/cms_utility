@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}CMS Upload Utility: Batch Upload{% endblock %}
+
+{% block subheader %}
+<div id="sub-header">
+    <ul>
+        <li><a href="{{ settings.ROOT_URL }}settings/">Settings</a></li>
+        <li class="bold"><a href="{{ settings.ROOT_URL }}batch_upload/">Batch Upload</a></li>
+        <li><a href="{{ settings.ROOT_URL }}single_upload/">Single Upload</a></li>
+    </ul>
+</div>
+<div id="type-header">
+    <ul>
+        <li class="bold"><a href="{{ settings.ROOT_URL }}batch_upload/hierarchy/">Hierarchy</a></li>
+        <li><a href="{{ settings.ROOT_URL }}batch_upload/">Single Category</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if posts %}
+{% for post in posts %}
+<h3>File posted.</h3>
+<b>Title:</b> <pre>{{ post.title }}</pre>
+<b>Description:</b><pre>{{ post.description }}</pre>
+<b>Category:</b><pre>{{ post.categories.0 }}</pre>
+<b>Tags:</b><pre>{{ post.mt_keywords }}</pre>
+<p>Pub Date:</b><pre>{{ pub_date }}</pre>
+<b>Permalink</b><pre><a href="{{ post.permaLink }}">{{ post.permaLink }}</a></pre>
+{% endfor %}
+{% else %}
+{% if not config %}
+<strong><a href="{{ settings.ROOT_URL }}config/">Settings</a> not configured.</strong>
+{% else %}
+<p><strong>{{ config.email }}</strong></p>
+
+<form method="POST" action="" enctype="multipart/form-data">
+    <div class="fieldWrapper">
+        {{ form.post_file.errors }}
+        <label for="id_post_file">Zip File:</label>
+        <input id="post_file" name="post_file" type="file"/>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.category.errors }}
+        <label for="id_category">Category:</label>
+        <select id="category" name="category">
+            {% for c in categories %}
+            <option value="{{ c.description }}">{{ c.description }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.status.errors }}
+        <label for="id_status">Status:</label>
+        <select id="status" name="status">
+            <option>Published</option>
+            <option>Draft</option>
+        </select>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.tags.errors }}
+        <label for="id_tags">Tags:</label>
+        <input id="tags" name="tags" type="text"/>
+    </div>    
+    <div class="fieldWrapper">
+        {{ form.layout.errors }}
+        <label for="id_layout">File Layout:</label>
+        <select id="layout" name="layout">
+            {% for l in layouts %}
+            <option value="{{ l.0 }}">{{ l.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.dir_structure.errors }}
+        <label for="id_dir_structure">Directory Structure:</label>
+        <select id="dir_structure" name="dir_structure">
+            {% for s in dir_structures %}
+            <option value="{{ s.0 }}">{{ s.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.date.errors }}
+        <label for="id_date">Pub Date:</label>
+        <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
+    </div>
+    <input type="submit" value="Upload File"/>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}
