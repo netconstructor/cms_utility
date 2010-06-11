@@ -82,9 +82,9 @@ def parse_file(data, file_name, layout):
         title = data[0]
         description = "".join(data[1:])
     
-    title = title.replace('\n', '')
-#    print 't:' , title
-#    print 'd:', description
+    if title:
+        title = title.replace('\n', '')
+
     return (title, description)
 
 def text_file(post_file, file_name, is_zipfile=False):
@@ -165,7 +165,13 @@ def process_zip_file(post_file, layout="default", dir_structure='default'):
     zip_file = open(tmp_file_name, 'r')
     cms_zipfile = zipfile.ZipFile(zip_file)
     for info in cms_zipfile.infolist():
-        if info.filename.endswith('/'):
+        if info.filename.startswith('.'):
+            pass
+        elif info.filename.startswith('_'):
+            pass
+        elif info.filename.find('/.') > 0:
+            pass
+        elif info.filename.endswith('/'):
             os.mkdir(directory + '/' + info.filename)
             dirs.append(directory + '/' + info.filename)
         else:
