@@ -1,7 +1,6 @@
 import pyblog
 import time
 import xmlrpclib
-import pprint 
 
 from django.views.generic.simple import direct_to_template
 from django.conf import settings
@@ -155,7 +154,6 @@ def single_upload_file_info(request):
                 post = {'title': title, 'description': description,
                 'mt_keywords': tags, 'categories': [category], 
                 'dateCreated': date_created, }
-                print post
                 rv = blog.new_post(post)
                 post = blog.get_post(rv)
         else:
