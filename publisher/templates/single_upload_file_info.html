@@ -80,6 +80,7 @@
         <label for="id_date">Pub Date:</label>
         <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
     </div>
+    <input type="hidden" name="dir_structure" value="default"/>
     <input type="submit" value="Upload File"/>
 </form>
 {% endif %}
