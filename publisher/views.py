@@ -77,9 +77,6 @@ def single_upload(request):
                 
                 rv = blog.new_post(post)
                 post = blog.get_post(rv)
-            else:
-                print 'bad form!'
-                print form.errors                
         else:
             form = FileUploadForm()
             post = None
