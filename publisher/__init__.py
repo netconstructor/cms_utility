@@ -3,6 +3,7 @@ import models
 import zipfile
 import tempfile
 import os
+import unicodedata
 
 def get_messages(request):
     message = None
@@ -81,19 +82,29 @@ def parse_file(data, file_name, layout):
         title = data[0]
         description = "".join(data[1:])
     
+    title = title.replace('\n', '')
+#    print 't:' , title
+#    print 'd:', description
     return (title, description)
 
 def text_file(post_file, file_name, is_zipfile=False):
     if is_zipfile:
         post_file = open(file_name, 'r')
-        lines = post_file.readlines()
+        lines = post_file.read()
         post_file.close()
     else:
-        lines = post_file.readlines()
+        lines = post_file.read()
 
     if is_zipfile:
         os.unlink(file_name)
-        
+    
+    lines = lines.replace('\r\n', '\n')
+    lines = lines.replace('\r', '\n')
+    lines = unicodedata.normalize('NFC', unicode(lines, 'mac_roman')).encode('utf-8')
+    lines = lines.replace('\xe2\x80\x98', "'")
+    lines = lines.replace('\xe2\x80\x99', "'")
+    lines = lines.splitlines(True)
+    
     return lines
 
 def word_file(post_file, file_name, is_zipfile=False):

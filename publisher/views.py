@@ -154,8 +154,8 @@ def single_upload_file_info(request):
                 
                 post = {'title': title, 'description': description,
                 'mt_keywords': tags, 'categories': [category], 
-                'dateCreated': date_created, 'wp_slug': 'test-is-the-slug',}
-                
+                'dateCreated': date_created, }
+                print post
                 rv = blog.new_post(post)
                 post = blog.get_post(rv)
         else:
