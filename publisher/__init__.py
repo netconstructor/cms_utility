@@ -4,6 +4,7 @@ import zipfile
 import tempfile
 import os
 import unicodedata
+import shutil
 
 def get_messages(request):
     message = None
@@ -181,20 +182,21 @@ def process_zip_file(post_file, layout="default", dir_structure='default'):
             outfile.flush()
             outfile.close()
             
-
-            (title, description) = process_file(extracted_name, layout, 
-                is_zipfile=True)
+            post = {}
+            (title, description) = process_file(extracted_name, 
+                layout, is_zipfile=True)
+            post['title'] = title
+            post['description'] = description
 
             if dir_structure == '1':
-                category = info.filename.split(os.path.sep)[0]
-                posts.append({'title': title, 'description': description, 
-                    'category': category})
-            else:
-                posts.append({'title': title, 'description': description})
-                
+                try:
+                    post['category'] = info.filename.split(os.path.sep)[-2]
+                except IndexError:
+                    pass
+            if title and description:
+                posts.append(post)
+             
     os.unlink(tmp_file_name)
-    for d in dirs:
-        os.rmdir(d)
-    os.rmdir(directory)
+    shutil.rmtree(directory)
     
     return posts
