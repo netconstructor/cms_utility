@@ -29,3 +29,6 @@ urlpatterns = patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT}),
 )
+
+handler500 = 'publisher.views.server_error'
+handler404 = 'publisher.views.page_not_found' 
