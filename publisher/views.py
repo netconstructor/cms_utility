@@ -5,8 +5,10 @@ import xmlrpclib
 from django.views.generic.simple import direct_to_template
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
-from models import Settings, LAYOUTS, DIR_STRUCTURES
+from models import Settings, LAYOUTS, DIR_STRUCTURES, DocumentsProcessed
 from forms import FileUploadForm, SettingsForm
 from publisher import *
 
@@ -69,13 +71,17 @@ def single_upload(request):
                     time.mktime(pub_date.timetuple()))
                 tags = form.cleaned_data['tags']
                 category = form.cleaned_data['category']
+
+                if title and description:
+                    post = {'title': title, 'description': description,
+                    'mt_keywords': tags, 'categories': [category], 
+                    'dateCreated': date_created, }
                 
-                post = {'title': title, 'description': description,
-                'mt_keywords': tags, 'categories': [category], 
-                'dateCreated': date_created, }
-                
-                rv = blog.new_post(post)
-                post = blog.get_post(rv)
+                    rv = blog.new_post(post)
+                    post = blog.get_post(rv)
+                    dp = DocumentsProcessed.objects.get(id=1)
+                    dp.total += 1
+                    dp.save()
         else:
             form = FileUploadForm()
             post = None
@@ -119,6 +125,9 @@ def batch_upload(request):
                     rv = blog.new_post(post)
                     post = blog.get_post(rv)
                     rv_posts.append(post)
+                dp = DocumentsProcessed.objects.get(id=1)
+                dp.total += len(rv_posts)
+                dp.save()
         else:
             form = FileUploadForm()
             posts = None
@@ -156,6 +165,9 @@ def single_upload_file_info(request):
                 'dateCreated': date_created, }
                 rv = blog.new_post(post)
                 post = blog.get_post(rv)
+                dp = DocumentsProcessed.objects.get(id=1)
+                dp.total += 1
+                dp.save()
         else:
             form = FileUploadForm()
             post = None
@@ -216,6 +228,9 @@ def batch_upload_hierarchy(request):
                     rv = blog.new_post(post)
                     post = blog.get_post(rv)
                     rv_posts.append(post)
+                dp = DocumentsProcessed.objects.get(id=1)
+                dp.total += len(rv_posts)
+                dp.save()
         else:
             form = FileUploadForm()
             posts = None
@@ -226,3 +241,12 @@ def batch_upload_hierarchy(request):
         {'config': config, 'categories': categories,
         'form': form, 'posts': rv_posts, 'pub_date': pub_date, 
         'layouts': LAYOUTS, 'dir_structures': DIR_STRUCTURES, })
+
+def server_error(request, template_name='500.html'):
+    return render_to_response(template_name,
+           context_instance = RequestContext(request))
+           
+def page_not_found(request, template_name='404.html'):
+    return render_to_response(template_name,
+           context_instance = RequestContext(request))
+    
