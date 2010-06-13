@@ -3,7 +3,11 @@ import os
 from socket import gethostname
 from localsettings import *
 
-DEBUG = True
+if gethostname() == 'debian':
+    DEBUG = True
+else:
+    DEBUG = False
+    
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
