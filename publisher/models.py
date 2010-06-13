@@ -22,8 +22,8 @@ Line 3: Begin Story""")
 )
 
 DIR_STRUCTURES = (
-    ('default', 'Single Folder'),
-    ('1', """TOP DIRECTORY -> MAIN CATEGORY""")
+   # ('default', 'Single Folder'),
+    ('1', 'TOP DIRECTORY -> MAIN CATEGORY')
 )
 
 # Create your models here.
@@ -34,3 +34,6 @@ class Settings(models.Model):
     cms_url = models.URLField()
     cms_user = models.CharField(max_length=75)
     cms_pass = models.CharField(max_length=75)
+    
+class DocumentsProcessed(models.Model):
+    total = models.IntegerField()
