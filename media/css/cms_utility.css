@@ -86,3 +86,8 @@ a:hover {
 .bold {
     font-weight: bold;
 }
+
+#stats {
+    text-align: right;
+    font-size: 70%;
+}
