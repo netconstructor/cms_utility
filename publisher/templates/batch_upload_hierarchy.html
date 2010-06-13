@@ -42,6 +42,7 @@
         <label for="id_post_file">Zip File:</label>
         <input id="post_file" name="post_file" type="file"/>
     </div>
+    <!-- 
     <div class="fieldWrapper">
         {{ form.category.errors }}
         <label for="id_category">Category:</label>
@@ -51,6 +52,8 @@
             {% endfor %}
         </select>
     </div>
+    -->
+    <input type="hidden" name="category" value="Uncategorized"/>
     <div class="fieldWrapper">
         {{ form.status.errors }}
         <label for="id_status">Status:</label>
@@ -77,9 +80,7 @@
         {{ form.dir_structure.errors }}
         <label for="id_dir_structure">Directory Structure:</label>
         <select id="dir_structure" name="dir_structure">
-            {% for s in dir_structures %}
-            <option value="{{ s.0 }}">{{ s.1 }}</option>
-            {% endfor %}
+            <option value="1">TOP DIRECTORY -> MAIN CATEGORY</option>
         </select>
     </div>
     <div class="fieldWrapper">
