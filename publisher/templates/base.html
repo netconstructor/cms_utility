@@ -14,6 +14,10 @@
     <div id="header">
         <a href="{{ settings.ROOT_URL }}">CMS UPLOAD UTILITY</a>
     </div>
+    <div id="stats">
+        Number of Users: {{ num_users }}<br/>
+        Documents Processed: {{ doc_count }}
+    </div>
     {% block subheader %}
     <div id="sub-header">
         <ul>
@@ -26,6 +30,7 @@
     <div id="content">
         {% block content %}{% endblock %}
     </div>
+
 </div>
 
 </body>
