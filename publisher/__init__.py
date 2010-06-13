@@ -120,13 +120,13 @@ def word_file(post_file, file_name, is_zipfile=False):
         
     command = settings.ANTIWORD + " \"" + tmp_file_name + "\""
     lines = os.popen(command).read().split('\n\n')
-    
+
     tmp_list = []
-    for line in lines[0].lstrip('\n').split('\n'):
+    for line in lines:
         tmp_list.append(line + '\n')
 
     os.unlink(tmp_file_name)    
-
+    print tmp_list
     return tmp_list
 
 def rtf_file(post_file, file_name, is_zipfile=False):
@@ -142,7 +142,7 @@ def rtf_file(post_file, file_name, is_zipfile=False):
     command = settings.UNRTF + " -t text \"" + tmp_file_name + "\" 2> /dev/null"
     data = os.popen(command).read()
     lines = data.split('-----------------')[1].split('\n')[1:]
-    
+
     tmp_list = []
     for line in lines:
         tmp_list.append(line + '\n')
