@@ -126,7 +126,7 @@ def word_file(post_file, file_name, is_zipfile=False):
         tmp_list.append(line + '\n')
 
     os.unlink(tmp_file_name)    
-    print tmp_list
+
     return tmp_list
 
 def rtf_file(post_file, file_name, is_zipfile=False):
