@@ -4,6 +4,7 @@ from socket import gethostname
 ROOT_PATH = os.path.dirname(__file__)
 ROOT_URL = 'http://localhost:8000/' 
 ANTIWORD = '/usr/bin/antiword'
+WVTEXT = '/usr/bin/wvText'
 UNRTF = '/usr/bin/unrtf --text'
 TEMP_FILES = '/tmp/temp_files'
 
