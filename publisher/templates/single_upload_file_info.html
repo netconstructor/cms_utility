@@ -24,7 +24,7 @@
 {% if post %}
 <h3>File posted.</h3>
 <b>Title:</b> <pre>{{ post.title }}</pre>
-<b>Description:</b><br/><p>{{ post.description }}</p>
+<b>Description:</b><br/><p>{{ post.description|safe }}</p>
 <b>Category:</b><pre>{{ post.categories.0 }}</pre>
 <b>Tags:</b><pre>{{ post.mt_keywords }}</pre>
 <p>Pub Date:</b><pre>{{ pub_date }}</pre>
