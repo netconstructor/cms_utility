@@ -1,10 +1,14 @@
 from django.conf import settings
+from django.utils.encoding import smart_unicode
+
 import models
 import zipfile
 import tempfile
 import os
 import unicodedata
+import codecs
 import shutil
+import re
 
 def get_messages(request):
     message = None
@@ -55,33 +59,33 @@ def parse_file(data, file_name, layout):
         title = description = None
     elif layout == '1':
         title = data[0]
-        description = "".join(data[4:])
-        description += 'Author: ' + data[1]
-        description += 'Pub Date: ' + data[2]
-        description += 'Source: ' + data[3]
+        description = "<br/><br/>".join(data[4:])
+        description += '<br/><br/>Author: ' + data[1]
+        description += '<br/>Pub Date: ' + data[2]
+        description += '<br/>Source: ' + data[3]
     elif layout == '2':
         title = data[0]
-        description = "".join(data[3:])
-        description += 'Author: ' + data[1]
-        description += 'Source: ' + data[2]
+        description = "<br/><br/>".join(data[3:])
+        description += '<br/><br/>Author: ' + data[1]
+        description += '<br/>Source: ' + data[2]
     elif layout == '3':
         title = os.path.basename(file_name)
         for ext in ['.txt', '.doc', '.rtf']:
             title = title.rstrip(ext)
-        description = "".join(data[3:])
-        description += 'Author: ' + data[0]
-        description += 'Pub Date: ' + data[1]
-        description += 'Source: ' + data[2]
+        description = "<br/><br/>".join(data[3:])
+        description += '<br/><br/>Author: ' + data[0]
+        description += '<br/>Pub Date: ' + data[1]
+        description += '<br/>Source: ' + data[2]
     elif layout == '4':
         title = os.path.basename(file_name)
         for ext in ['.txt', '.doc', '.rtf']:
             title = title.rstrip(ext)
-        description = "".join(data[2:])
-        description += 'Byline: ' + data[0]
-        description += 'Source: ' + data[1]
+        description = "<br/><br/>".join(data[2:])
+        description += '<br/><br/>Byline: ' + data[0]
+        description += '<br/>Source: ' + data[1]
     else: # default 
         title = data[0]
-        description = "".join(data[1:])
+        description = "<br/><br/>".join(data[1:])
     
     if title:
         title = title.replace('\n', '')
@@ -90,23 +94,20 @@ def parse_file(data, file_name, layout):
 
 def text_file(post_file, file_name, is_zipfile=False):
     if is_zipfile:
-        post_file = open(file_name, 'r')
+        post_file = codecs.open(file_name, encoding='mac_roman')
         lines = post_file.read()
         post_file.close()
     else:
-        lines = post_file.read()
-
+        lines = smart_unicode(post_file.read(), encoding='mac_roman', errors='replace')
     if is_zipfile:
         os.unlink(file_name)
     
+    lines = lines.replace('\n\n', '\n')
     lines = lines.replace('\r\n', '\n')
     lines = lines.replace('\r', '\n')
-    lines = unicodedata.normalize('NFC', unicode(lines, 'mac_roman')).encode('utf-8')
-    lines = lines.replace('\xe2\x80\x98', "'")
-    lines = lines.replace('\xe2\x80\x99', "'")
-    lines = lines.splitlines(True)
+    lines = unicodedata.normalize('NFKD', lines).encode('ascii', 'ignore')
     
-    return lines
+    return lines.splitlines()
 
 def word_file(post_file, file_name, is_zipfile=False):
     if is_zipfile:
@@ -118,18 +119,21 @@ def word_file(post_file, file_name, is_zipfile=False):
             tmp_file.write(chunk)
         tmp_file.close()
         
-    command = settings.ANTIWORD + " \"" + tmp_file_name + "\""
-    lines = os.popen(command).read().split('\n\n')
+    command = settings.WVTEXT + " \"" + tmp_file_name + "\" /dev/stdout"
+    lines = os.popen(command).read()
+    lines = lines.strip()
+    lines = lines.split('\n\n')
 
     tmp_list = []
     for line in lines:
-        tmp_list.append(line + '\n')
+        tmp_list.append(line.replace('\n', ''))
 
     os.unlink(tmp_file_name)    
 
     return tmp_list
 
 def rtf_file(post_file, file_name, is_zipfile=False):
+    regex = re.compile(r'<.*?>')
     if is_zipfile:
         tmp_file_name = file_name
     else:
@@ -139,17 +143,15 @@ def rtf_file(post_file, file_name, is_zipfile=False):
             tmp_file.write(chunk)
         tmp_file.close()
 
-    command = settings.UNRTF + " -t text \"" + tmp_file_name + "\" 2> /dev/null"
+    command = settings.UNRTF + " -t html \"" + tmp_file_name + "\" 2> /dev/null"
     data = os.popen(command).read()
-    lines = data.split('-----------------')[1].split('\n')[1:]
+    data = regex.sub('', data)
+    data = data.strip()
+    data = data.replace('\n\n', '\n')
 
-    tmp_list = []
-    for line in lines:
-        tmp_list.append(line + '\n')
-        
     os.unlink(tmp_file_name)    
 
-    return tmp_list
+    return data.splitlines()
     
 def process_zip_file(post_file, layout="default", dir_structure='default'):
     file_name = post_file.name
