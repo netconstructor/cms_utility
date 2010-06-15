@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.utils.encoding import smart_unicode
 
+from models import DocumentsProcessed
+
 import models
 import zipfile
 import tempfile
@@ -9,6 +11,11 @@ import unicodedata
 import codecs
 import shutil
 import re
+import urllib
+import xmlrpclib
+
+from BeautifulSoup import BeautifulSoup, BeautifulStoneSoup
+from ebdata.nlp import addresses
 
 def get_messages(request):
     message = None
@@ -51,8 +58,7 @@ def process_file(post_file, layout='default', is_zipfile=False):
     else: 
         data = None
     
-    (title, description) = parse_file(data, file_name, layout)
-    return (title, description)
+    return parse_file(data, file_name, layout)
     
 def parse_file(data, file_name, layout):
     if not data:
@@ -90,7 +96,24 @@ def parse_file(data, file_name, layout):
     if title:
         title = title.replace('\n', '')
 
-    return (title, description)
+    post = {'title': title, 'description': description, 'address': None,
+        'latitude': None, 'longitude': None}
+        
+    if data and settings.PARSE_ADDRESSES:
+        address = get_address(" ".join(data))
+        if address['address']:
+            description += '<br/><br/><font size="-2">Location: ' + address['address'] + ' '
+            description += settings.CITY + ', ' + settings.STATE
+            description += '<br/>Coords: ' + str(address['latitude'])
+            description += ', ' + str(address['longitude']) + "</font>"
+            
+            post['description'] = description
+            post['address'] = address['address']
+            post['latitude'] = address['latitude']
+            post['longitude'] = address['longitude']
+            
+            
+    return post
 
 def text_file(post_file, file_name, is_zipfile=False):
     if is_zipfile:
@@ -184,21 +207,85 @@ def process_zip_file(post_file, layout="default", dir_structure='default'):
             outfile.flush()
             outfile.close()
             
-            post = {}
-            (title, description) = process_file(extracted_name, 
+            post = process_file(extracted_name, 
                 layout, is_zipfile=True)
-            post['title'] = title
-            post['description'] = description
 
             if dir_structure == '1':
                 try:
                     post['category'] = info.filename.split(os.path.sep)[-2]
                 except IndexError:
                     pass
-            if title and description:
+                    
+            if post['title'] and post['description']:
                 posts.append(post)
              
     os.unlink(tmp_file_name)
     shutil.rmtree(directory)
     
     return posts
+    
+def get_address(text=""):
+    _addresses = addresses.parse_addresses(text)
+    a_dict = {'address': None, 'latitude': None, 'longitude': None}
+    for address in _addresses:
+        if a_dict['address']: # only use the first match for now
+            continue
+        a_dict = geocode(address[0], city=settings.CITY, state=settings.STATE)
+    
+    return a_dict
+
+def geocode(address="", city="", state="CA"):
+    address = urllib.quote(address.encode('utf-8'))
+    g_url = 'http://local.yahooapis.com/MapsService/V1/geocode?appid='
+    g_url += '0MoPk9DV34FH0rumXB_xENjSlf.jdG4woRO9nFqyUcM86nLsFSynUvAwZZo6g--'
+    g_url += '&street=%s&city=%s&state=%s' % (address, city, state)
+
+    url = urllib.urlopen(g_url)
+    dom = BeautifulStoneSoup(url)
+    url.close()
+
+    coords = { 'address': None, 'latitude': None, 'longitude': None, }
+
+    result_attr = dom.find('result')
+
+    if result_attr and result_attr['precision'] == 'address':
+
+        dom_fields = ['address', 'latitude', 'longitude']
+        for field in dom_fields:
+            i = dom.find(field)
+            if i:
+                if field == 'address': 
+                    coords[field] = i.string
+                else:
+                    try:
+                        coords[field] = float(i.string)
+                    except:
+                        pass
+
+    return coords
+    
+def new_post(blog, post):
+    if not post['title'] and not post['description']:
+        return False
+    
+    address = post.pop('address', None)
+    latitude = post.pop('latitude', None)
+    longitude = post.pop('longitude', None)
+    rv = blog.new_post(post)
+    post = blog.get_post(rv)
+    dp = DocumentsProcessed.objects.get(id=1)
+    dp.total += 1
+    dp.save()
+    
+    if latitude and longitude:
+        add_coords(blog, rv, latitude, longitude)
+    return rv
+    
+def add_coords(blog, post_id, latitude, longitude):
+        try:
+            idx = blog.methods.index('wpgeo.setCoords')
+            coords = blog.server.wpgeo.setCoords(post_id, blog.username,
+                blog.password, {'_wp_geo_latitude': latitude, 
+                '_wp_geo_longitude': longitude})
+        except ValueError:
+            pass
