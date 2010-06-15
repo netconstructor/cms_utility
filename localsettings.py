@@ -8,6 +8,10 @@ WVTEXT = '/usr/bin/wvText'
 UNRTF = '/usr/bin/unrtf --text'
 TEMP_FILES = '/tmp/temp_files'
 
+PARSE_ADDRESSES = True
+CITY = 'Fairfield'
+STATE = 'CA'
+
 # for prod
 if gethostname() == 'www3.news-apps.com':
     ROOT_URL = 'http://apps.joeboydston.com/cms_utility/'
