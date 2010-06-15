@@ -64,24 +64,17 @@ def single_upload(request):
             file_name = None
             if form.is_valid():
                 post_file = form.cleaned_data['post_file']
-                (title, description) = process_file(post_file)
-                
-                pub_date = form.cleaned_data['date']
-                date_created = xmlrpclib.DateTime(
-                    time.mktime(pub_date.timetuple()))
-                tags = form.cleaned_data['tags']
-                category = form.cleaned_data['category']
+                post = process_file(post_file)
 
-                if title and description:
-                    post = {'title': title, 'description': description,
-                    'mt_keywords': tags, 'categories': [category], 
-                    'dateCreated': date_created, }
-                
-                    rv = blog.new_post(post)
-                    post = blog.get_post(rv)
-                    dp = DocumentsProcessed.objects.get(id=1)
-                    dp.total += 1
-                    dp.save()
+                pub_date = form.cleaned_data['date']
+                post['dateCreated'] = xmlrpclib.DateTime(
+                    time.mktime(pub_date.timetuple()))
+                    
+                post['mt_keywords'] = form.cleaned_data['tags']
+                post['categories'] = [form.cleaned_data['category']]            
+            
+                rv = new_post(blog, post)
+                post = blog.get_post(rv)
         else:
             form = FileUploadForm()
             post = None
@@ -110,24 +103,19 @@ def batch_upload(request):
                 posts = process_zip_file(post_file)
                 
                 pub_date = form.cleaned_data['date']
-                date_created = xmlrpclib.DateTime(
+                dateCreated = xmlrpclib.DateTime(
                     time.mktime(pub_date.timetuple()))
-                tags = form.cleaned_data['tags']
-                category = form.cleaned_data['category']
-                
+                mt_keywords = form.cleaned_data['tags']
+                categories = [form.cleaned_data['category']]
                 
                 rv_posts = []
                 for cms_post in posts:
-                    post = {'title': cms_post['title'], 
-                    'description': cms_post['description'], 
-                    'mt_keywords': tags, 'categories': [category], 
-                    'dateCreated': date_created, }
-                    rv = blog.new_post(post)
+                    cms_post['dateCreated'] = dateCreated
+                    cms_post['mt_keywords'] = mt_keywords
+                    cms_post['categories'] = categories
+                    rv = new_post(blog, cms_post)
                     post = blog.get_post(rv)
                     rv_posts.append(post)
-                dp = DocumentsProcessed.objects.get(id=1)
-                dp.total += len(rv_posts)
-                dp.save()
         else:
             form = FileUploadForm()
             posts = None
@@ -152,22 +140,16 @@ def single_upload_file_info(request):
             if form.is_valid():
                 post_file = form.cleaned_data['post_file']
                 layout = form.cleaned_data['layout']
-                (title, description) = process_file(post_file, layout)
+                post = process_file(post_file, layout=layout)
                 
                 pub_date = form.cleaned_data['date']
-                date_created = xmlrpclib.DateTime(
+                post['dateCreated'] = xmlrpclib.DateTime(
                     time.mktime(pub_date.timetuple()))
-                tags = form.cleaned_data['tags']
-                category = form.cleaned_data['category']
+                post['mt_keywords'] = form.cleaned_data['tags']
+                post['categories'] = [form.cleaned_data['category']]
                 
-                post = {'title': title, 'description': description,
-                'mt_keywords': tags, 'categories': [category], 
-                'dateCreated': date_created, }
-                rv = blog.new_post(post)
+                rv = new_post(blog, post)
                 post = blog.get_post(rv)
-                dp = DocumentsProcessed.objects.get(id=1)
-                dp.total += 1
-                dp.save()
         else:
             form = FileUploadForm()
             post = None
@@ -195,12 +177,13 @@ def batch_upload_hierarchy(request):
                 post_file = form.cleaned_data['post_file']
                 layout = form.cleaned_data['layout']
                 dir_structure = form.cleaned_data['dir_structure']
-                posts = process_zip_file(post_file, layout, dir_structure)
-
+                posts = process_zip_file(post_file, layout=layout, 
+                    dir_structure=dir_structure)
+                    
                 pub_date = form.cleaned_data['date']
-                date_created = xmlrpclib.DateTime(
+                dateCreated = xmlrpclib.DateTime(
                     time.mktime(pub_date.timetuple()))
-                tags = form.cleaned_data['tags']
+                mt_keywords = form.cleaned_data['tags']
                 category = form.cleaned_data['category']
 
 
@@ -218,25 +201,23 @@ def batch_upload_hierarchy(request):
                                 'slug': cms_post['category'].replace(' ', '-'),
                                 'parent_id': 0, 
                                 'description': cms_post['category']})
+                        cms_post['category'] = [cms_post['category']]
                     else: 
-                        post_category = [category]
+                        cms_post['category'] = [category]
                         
-                    post = {'title': cms_post['title'], 
-                    'description': cms_post['description'], 
-                    'mt_keywords': tags, 'categories': post_category, 
-                    'dateCreated': date_created, }
-                    rv = blog.new_post(post)
-                    post = blog.get_post(rv)
-                    rv_posts.append(post)
-                dp = DocumentsProcessed.objects.get(id=1)
-                dp.total += len(rv_posts)
-                dp.save()
+                    cms_post['mt_keywords'] = mt_keywords
+                    cms_post['dateCreated'] = dateCreated
+                    
+                    rv = new_post(blog, cms_post)
+                    if rv:
+                        post = blog.get_post(rv)            
+                        rv_posts.append(post)
         else:
             form = FileUploadForm()
             posts = None
     else:
         post = form = categories = pub_date = None
-
+        
     return direct_to_template(request, 'batch_upload_hierarchy.html', 
         {'config': config, 'categories': categories,
         'form': form, 'posts': rv_posts, 'pub_date': pub_date, 
