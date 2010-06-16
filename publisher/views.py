@@ -52,7 +52,7 @@ def clear_cms_settings(request):
     return HttpResponseRedirect(settings.ROOT_URL+'settings/')
         
 def single_upload(request):
-    post = form = categories = pub_date = None
+    post = form = categories = pub_date = image = None
     config = lookup_settings(request)
     
     if config: 
@@ -66,6 +66,11 @@ def single_upload(request):
                 post_file = form.cleaned_data['post_file']
                 post = process_file(post_file)
 
+                if 'image_file' in form.cleaned_data:
+                    image_file = form.cleaned_data['image_file']
+                    img = upload_image(blog, image_file)
+                    post['description'] += '<br/><img src="' + img['url'] + '"/>'
+                    
                 pub_date = form.cleaned_data['date']
                 post['dateCreated'] = xmlrpclib.DateTime(
                     time.mktime(pub_date.timetuple()))
@@ -141,6 +146,11 @@ def single_upload_file_info(request):
                 post_file = form.cleaned_data['post_file']
                 layout = form.cleaned_data['layout']
                 post = process_file(post_file, layout=layout)
+                
+                if 'image_file' in form.cleaned_data:
+                    image_file = form.cleaned_data['image_file']
+                    img = upload_image(blog, image_file)
+                    post['description'] += '<br/><img src="' + img['url'] + '"/>'                
                 
                 pub_date = form.cleaned_data['date']
                 post['dateCreated'] = xmlrpclib.DateTime(
