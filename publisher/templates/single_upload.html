@@ -26,8 +26,8 @@
 <b>Title:</b> <pre>{{ post.title }}</pre>
 <b>Description:</b><p>{{ post.description|safe }}</p>
 <b>Category:</b><pre>{{ post.categories.0 }}</pre>
-<b>Tags:</b><pre>{{ post.mt_keywords }}</pre>
-<p>Pub Date:</b><pre>{{ pub_date }}</pre>
+<b>Pub Date:</b><pre>{{ pub_date }}</pre>
+<b>Tags:</b><pre>{{ post.mt_keywords|default:"None" }}</pre>
 <b>Permalink</b><pre><a href="{{ post.permaLink }}">{{ post.permaLink }}</a></pre>
 
 {% else %}
@@ -60,14 +60,23 @@
         </select>
     </div>
     <div class="fieldWrapper">
-        {{ form.tags.errors }}
-        <label for="id_tags">Tags:</label>
-        <input id="tags" name="tags" type="text"/>
-    </div>    
-    <div class="fieldWrapper">
         {{ form.date.errors }}
         <label for="id_date">Pub Date:</label>
         <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
+    </div>
+    <div>
+        <br/>
+        <em>(* optional fields)</em>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.tags.errors }}
+        <em><label for="id_tags">Tags:</label></em>
+        <input id="tags" name="tags" type="text"/>
+    </div>    
+    <div class="fieldWrapper">
+        {{ form.image_file.errors }}
+        <em><label for="id_image_file">Image:</label></em>
+        <input id="image_file" name="image_file" type="file"/> 
     </div>
     <input type="hidden" name="layout" value="default"/>
     <input type="hidden" name="dir_structure" value="default"/>
