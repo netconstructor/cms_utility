@@ -8,6 +8,7 @@ class SettingsForm(forms.ModelForm):
         
 class FileUploadForm(forms.Form):
     post_file = forms.FileField()
+    image_file = forms.FileField(required=False)
     category = forms.CharField()
     status = forms.CharField()
     date = forms.DateTimeField()
