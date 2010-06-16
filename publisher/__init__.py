@@ -289,3 +289,22 @@ def add_coords(blog, post_id, latitude, longitude):
                 '_wp_geo_longitude': longitude})
         except ValueError:
             pass
+            
+def upload_image(blog, image_file):
+    tmp_file_name = settings.TEMP_FILES + '/' + image_file.name
+    tmp_file = open(tmp_file_name, 'w')
+
+    for chunk in image_file.chunks():
+        tmp_file.write(chunk)
+    tmp_file.close()
+    
+    tmp_file = open(tmp_file_name)
+    data = xmlrpclib.Binary(tmp_file.read())
+    tmp_file.close()
+    
+    img = blog.upload_file({'name': image_file.name, 
+        'type': image_file.content_type, 'bits': data, 'overwrite': 'true'})
+    
+    os.unlink(tmp_file_name)
+    return img
+    
