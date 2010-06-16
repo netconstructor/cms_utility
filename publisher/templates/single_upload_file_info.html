@@ -60,12 +60,6 @@
         </select>
     </div>
     <div class="fieldWrapper">
-        {{ form.tags.errors }}
-        <label for="id_tags">Tags:</label>
-        <input id="tags" name="tags" type="text"/>
-    </div>    
-    
-    <div class="fieldWrapper">
         {{ form.layout.errors }}
         <label for="id_layout">File Layout:</label>
         <select id="layout" name="layout">
@@ -79,6 +73,20 @@
         {{ form.date.errors }}
         <label for="id_date">Pub Date:</label>
         <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
+    </div>
+    <div>
+        <br/>
+        <em>(* optional fields)</em>
+    </div>
+    <div class="fieldWrapper">
+        {{ form.tags.errors }}
+        <em><label for="id_tags">Tags:</label></em>
+        <input id="tags" name="tags" type="text"/>
+    </div>    
+    <div class="fieldWrapper">
+        {{ form.image_file.errors }}
+        <em><label for="id_image_file">Image:</label></em>
+        <input id="image_file" name="image_file" type="file"/> 
     </div>
     <input type="hidden" name="dir_structure" value="default"/>
     <input type="submit" value="Upload File"/>
