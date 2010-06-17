@@ -5,7 +5,7 @@
 {% block subheader %}
 <div id="sub-header">
     <ul>
-        <li class="bold"><a href="{{ settings.ROOT_URL }}settings/">Settings</a></li>
+        <li class="bold"><a href="{{ settings.ROOT_URL }}options/">Options</a></li>
         <li><a href="{{ settings.ROOT_URL }}batch_upload/">Batch Upload</a></li>
         <li><a href="{{ settings.ROOT_URL }}single_upload/">Single Upload</a></li>
     </ul>
@@ -22,7 +22,7 @@
 
 {% if not config %}
 <div id="retrieve_settings" class="formset">
-<form method="POST" action="{{ settings.ROOT_URL }}settings/get/">
+<form method="POST" action="{{ settings.ROOT_URL }}options/get/">
 <strong>Retrieve Settings:</strong><br/>
 <label for="id_cms_email">E-mail Address:</label>
 <input type="text" name="cms_email" id="id_cms_email"/>
@@ -47,7 +47,7 @@ CMS Type: {{ config.get_cms_type_display }} <br/>
 CMS URL: {{ config.cms_url }}<br/>
 CMS User: {{ config.cms_user }}<br/>
 <br/>
-<a href="{{ settings.ROOT_URL }}settings/clear/">Clear Settings</a>
+<a href="{{ settings.ROOT_URL }}options/clear/">Clear Settings</a>
 {% endif %}
 </div>
 {% endblock %}
