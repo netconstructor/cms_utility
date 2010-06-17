@@ -17,9 +17,9 @@ urlpatterns = patterns('',
     # (r'^admin/(.*)', admin.site.root),
     (r'^$', 'publisher.views.index'),
     
-    (r'^settings/$', 'publisher.views.cms_settings'),
-    (r'^settings/get/$', 'publisher.views.get_cms_settings'),
-    (r'^settings/clear/$', 'publisher.views.clear_cms_settings'),
+    (r'^options/$', 'publisher.views.cms_settings'),
+    (r'^options/get/$', 'publisher.views.get_cms_settings'),
+    (r'^options/clear/$', 'publisher.views.clear_cms_settings'),
 
     (r'^single_upload/$', 'publisher.views.single_upload'),
     (r'^single_upload/file_info/$', 'publisher.views.single_upload_file_info'),
