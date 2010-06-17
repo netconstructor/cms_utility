@@ -30,7 +30,7 @@ def cms_settings(request):
             config = form.save()
             message = "Settings saved."
             request.session['cms_email'] = config.email
-            return HttpResponseRedirect(settings.ROOT_URL+'settings/')
+            return HttpResponseRedirect(settings.ROOT_URL+'options/')
     else:
         form = SettingsForm()
     
@@ -43,13 +43,13 @@ def get_cms_settings(request):
     if request.method == 'POST':
         if 'cms_email' in request.POST:
             request.session['cms_email'] = request.POST['cms_email']
-    return HttpResponseRedirect(settings.ROOT_URL+'settings/')
+    return HttpResponseRedirect(settings.ROOT_URL+'options/')
 
 def clear_cms_settings(request):
     if 'cms_email' in request.session:
         del request.session['cms_email']
     request.session['message'] = "Settings Cleared."
-    return HttpResponseRedirect(settings.ROOT_URL+'settings/')
+    return HttpResponseRedirect(settings.ROOT_URL+'options/')
         
 def single_upload(request):
     post = form = categories = pub_date = image = None
@@ -67,9 +67,10 @@ def single_upload(request):
                 post = process_file(post_file)
 
                 if 'image_file' in form.cleaned_data:
-                    image_file = form.cleaned_data['image_file']
-                    img = upload_image(blog, image_file)
-                    post['description'] += '<br/><img src="' + img['url'] + '"/>'
+                    if form.cleaned_data['image_file']:
+                        image_file = form.cleaned_data['image_file']
+                        img = upload_image(blog, image_file)
+                        post['description'] += '<br/><img src="' + img['url'] + '"/>'
                     
                 pub_date = form.cleaned_data['date']
                 post['dateCreated'] = xmlrpclib.DateTime(
@@ -148,9 +149,10 @@ def single_upload_file_info(request):
                 post = process_file(post_file, layout=layout)
                 
                 if 'image_file' in form.cleaned_data:
-                    image_file = form.cleaned_data['image_file']
-                    img = upload_image(blog, image_file)
-                    post['description'] += '<br/><img src="' + img['url'] + '"/>'                
+                    if form.cleaned_data['image_file']:
+                        image_file = form.cleaned_data['image_file']
+                        img = upload_image(blog, image_file)
+                        post['description'] += '<br/><img src="' + img['url'] + '"/>'                
                 
                 pub_date = form.cleaned_data['date']
                 post['dateCreated'] = xmlrpclib.DateTime(
