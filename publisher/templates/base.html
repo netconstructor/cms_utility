@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -15,13 +16,13 @@
         <a href="{{ settings.ROOT_URL }}">CMS UPLOAD UTILITY</a>
     </div>
     <div id="stats">
-        Number of Users: {{ num_users }}<br/>
-        Documents Processed: {{ doc_count }}
+        Number of Users: {{ num_users|intcomma }}<br/>
+        Documents Processed: {{ doc_count|intcomma }}
     </div>
     {% block subheader %}
     <div id="sub-header">
         <ul>
-            <li><a href="{{ settings.ROOT_URL }}settings/">Settings</a></li>
+            <li><a href="{{ settings.ROOT_URL }}options/">Options</a></li>
             <li><a href="{{ settings.ROOT_URL }}batch_upload/">Batch Upload</a></li>
             <li><a href="{{ settings.ROOT_URL }}single_upload/">Single Upload</a></li>
         </ul>
