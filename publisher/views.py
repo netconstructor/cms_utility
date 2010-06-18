@@ -213,9 +213,9 @@ def batch_upload_hierarchy(request):
                                 'slug': cms_post['category'].replace(' ', '-'),
                                 'parent_id': 0, 
                                 'description': cms_post['category']})
-                        cms_post['category'] = [cms_post['category']]
+                        cms_post['categories'] = [cms_post['category']]
                     else: 
-                        cms_post['category'] = [category]
+                        cms_post['categories'] = [category]
                         
                     cms_post['mt_keywords'] = mt_keywords
                     cms_post['dateCreated'] = dateCreated
