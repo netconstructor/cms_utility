@@ -67,8 +67,6 @@ def single_upload(request):
                 blog.parse_form(form)
                 blog.post_stories()
                 posts = blog.posted_posts
-            else:
-                print form
         else:
             form = blog.form()
             posts = pub_date = None

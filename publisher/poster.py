@@ -52,7 +52,6 @@ class CMSUtility(object):
         return image
         
     def parse_form(self, form, isZip=False, isHierarchy=False):
-        print 'f:', form.cleaned_data
         post_file = form.cleaned_data['post_file']
         layout = form.cleaned_data['layout']
         dir_structure = form.cleaned_data['dir_structure']
@@ -61,7 +60,6 @@ class CMSUtility(object):
             self.posts = process_zip_file(post_file, layout=layout, 
                 dir_structure=dir_structure)
         else:
-            print 'here'
             post = process_file(post_file, layout=layout)
         
             if 'image_file' in form.cleaned_data:

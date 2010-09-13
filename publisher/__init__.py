@@ -268,7 +268,6 @@ def geocode(address="", city="", state="CA"):
     return coords
     
 def new_wp_post(config, post):
-    print 'p:',post
     if not post['title'] and not post['description']:
         return False
 
