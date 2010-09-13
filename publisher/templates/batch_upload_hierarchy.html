@@ -29,7 +29,7 @@
 {% if not config %}
 <strong><a href="{{ settings.ROOT_URL }}config/">Settings</a> not configured.</strong>
 {% else %}
-{% ifnotequal config.cms_type WP %}
+{% ifnotequal config.cms_type "WP" %}
 <strong>Blog Type not supported</strong>
 {% else %}
 <p><strong>{{ config.email }}</strong></p>
