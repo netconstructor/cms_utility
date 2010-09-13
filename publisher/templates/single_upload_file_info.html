@@ -21,14 +21,11 @@
 
 {% block content %}
 
-{% if post %}
+{% if posts %}
+{% for post in posts %}
 <h3>File posted.</h3>
-<b>Title:</b> <pre>{{ post.title }}</pre>
-<b>Description:</b><br/><p>{{ post.description|safe }}</p>
-<b>Category:</b><pre>{{ post.categories.0 }}</pre>
-<b>Tags:</b><pre>{{ post.mt_keywords }}</pre>
-<p>Pub Date:</b><pre>{{ pub_date }}</pre>
 <b>Permalink</b><pre><a href="{{ post.permaLink }}">{{ post.permaLink }}</a></pre>
+{% endfor %}
 
 {% else %}
 {% if not config %}
@@ -42,6 +39,7 @@
         <label for="id_post_file">File:</label>
         <input id="post_file" name="post_file" type="file"/>
     </div>
+    {% if categories %}
     <div class="fieldWrapper">
         {{ form.category.errors }}
         <label for="id_category">Category:</label>
@@ -51,6 +49,7 @@
             {% endfor %}
         </select>
     </div>
+    {% endif %}
     <div class="fieldWrapper">
         {{ form.status.errors }}
         <label for="id_status">Status:</label>
@@ -68,7 +67,7 @@
             {% endfor %}
         </select>
     </div>
-    
+    {% ifequal config.cms_type 'WP' %}
     <div class="fieldWrapper">
         {{ form.date.errors }}
         <label for="id_date">Pub Date:</label>
@@ -88,6 +87,7 @@
         <em><label for="id_image_file">Image:</label></em>
         <input id="image_file" name="image_file" type="file"/> 
     </div>
+    {% endifequal %}
     <input type="hidden" name="dir_structure" value="default"/>
     <input type="submit" value="Upload File"/>
 </form>

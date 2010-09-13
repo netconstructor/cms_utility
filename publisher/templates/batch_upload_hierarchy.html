@@ -23,16 +23,14 @@
 {% if posts %}
 {% for post in posts %}
 <h3>File posted.</h3>
-<b>Title:</b> <pre>{{ post.title }}</pre>
-<b>Description:</b><p>{{ post.description|safe }}</p>
-<b>Category:</b><pre>{{ post.categories.0 }}</pre>
-<b>Tags:</b><pre>{{ post.mt_keywords }}</pre>
-<p>Pub Date:</b><pre>{{ pub_date }}</pre>
 <b>Permalink</b><pre><a href="{{ post.permaLink }}">{{ post.permaLink }}</a></pre>
 {% endfor %}
 {% else %}
 {% if not config %}
 <strong><a href="{{ settings.ROOT_URL }}config/">Settings</a> not configured.</strong>
+{% else %}
+{% ifnotequal config.cms_type WP %}
+<strong>Blog Type not supported</strong>
 {% else %}
 <p><strong>{{ config.email }}</strong></p>
 
@@ -90,6 +88,7 @@
     </div>
     <input type="submit" value="Upload File"/>
 </form>
+{% endifnotequal %}
 {% endif %}
 {% endif %}
 {% endblock %}

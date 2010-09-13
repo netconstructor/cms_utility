@@ -5,13 +5,25 @@ class SettingsForm(forms.ModelForm):
     cms_pass = forms.CharField(widget=forms.PasswordInput())
     class Meta:
         model = Settings
-        
+
+class CMSUploadForm(forms.Form):
+    post_file = forms.FileField()
+    status = forms.CharField()
+    layout = forms.CharField()
+    dir_structure = forms.CharField()
+   
+class WPUploadForm(CMSUploadForm):
+    image_file = forms.FileField(required=False)
+    category = forms.CharField()
+    date = forms.DateTimeField()
+    tags = forms.CharField(required=False)
+
 class FileUploadForm(forms.Form):
     post_file = forms.FileField()
     image_file = forms.FileField(required=False)
-    category = forms.CharField()
+    category = forms.CharField(required=False)
     status = forms.CharField()
-    date = forms.DateTimeField()
+    date = forms.DateTimeField(required=False)
     tags = forms.CharField(required=False)
     layout = forms.CharField()
     dir_structure = forms.CharField()

@@ -1,5 +1,5 @@
 import pyblog
-import time
+#import time
 import xmlrpclib
 
 from django.views.generic.simple import direct_to_template
@@ -11,6 +11,7 @@ from django.template import RequestContext
 from models import Settings, LAYOUTS, DIR_STRUCTURES, DocumentsProcessed
 from forms import FileUploadForm, SettingsForm
 from publisher import *
+from publisher.poster import CMSUtility
 
 def index(request):
     config = lookup_settings(request)
@@ -52,44 +53,31 @@ def clear_cms_settings(request):
     return HttpResponseRedirect(settings.ROOT_URL+'options/')
         
 def single_upload(request):
-    post = form = categories = pub_date = image = None
+    posts = categories = pub_date = image = None
     config = lookup_settings(request)
     
-    if config: 
-        blog = pyblog.WordPress(config.cms_url, config.cms_user, 
-                config.cms_pass)
+    if config:
+        blog = CMSUtility(config)
         categories = blog.get_categories()
+
         if request.method == 'POST':
-            form = FileUploadForm(request.POST, request.FILES)
+            form = blog.form(request.POST, request.FILES)
             file_name = None
             if form.is_valid():
-                post_file = form.cleaned_data['post_file']
-                post = process_file(post_file)
-
-                if 'image_file' in form.cleaned_data:
-                    if form.cleaned_data['image_file']:
-                        image_file = form.cleaned_data['image_file']
-                        img = upload_image(blog, image_file)
-                        post['description'] += '<br/><img src="' + img['url'] + '"/>'
-                    
-                pub_date = form.cleaned_data['date']
-                post['dateCreated'] = xmlrpclib.DateTime(
-                    time.mktime(pub_date.timetuple()))
-                    
-                post['mt_keywords'] = form.cleaned_data['tags']
-                post['categories'] = [form.cleaned_data['category']]            
-            
-                rv = new_post(blog, post)
-                post = blog.get_post(rv)
+                blog.parse_form(form)
+                blog.post_stories()
+                posts = blog.posted_posts
+            else:
+                print form
         else:
-            form = FileUploadForm()
-            post = None
+            form = blog.form()
+            posts = pub_date = None
     else:
-        post = form = categories = pub_date = None
+        posts = form = categories = pub_date = None
         
     return direct_to_template(request, 'single_upload.html', 
         {'config': config, 'categories': categories,
-        'form': form, 'post': post, 'pub_date': pub_date, 
+        'form': form, 'posts': posts, 'pub_date': pub_date, 
         'layout': 'default', })
     
 def batch_upload(request):
@@ -97,80 +85,50 @@ def batch_upload(request):
     config = lookup_settings(request)
     
     if config:
-        blog = pyblog.WordPress(config.cms_url, config.cms_user, 
-                config.cms_pass)
+        blog = CMSUtility(config)
         categories = blog.get_categories()
         
         if request.method == 'POST':
-            form = FileUploadForm(request.POST, request.FILES)
+            form = blog.form(request.POST, request.FILES)
             file_name = None
             if form.is_valid():
-                post_file = form.cleaned_data['post_file']
-                posts = process_zip_file(post_file)
-                
-                pub_date = form.cleaned_data['date']
-                dateCreated = xmlrpclib.DateTime(
-                    time.mktime(pub_date.timetuple()))
-                mt_keywords = form.cleaned_data['tags']
-                categories = [form.cleaned_data['category']]
-                
-                rv_posts = []
-                for cms_post in posts:
-                    cms_post['dateCreated'] = dateCreated
-                    cms_post['mt_keywords'] = mt_keywords
-                    cms_post['categories'] = categories
-                    rv = new_post(blog, cms_post)
-                    post = blog.get_post(rv)
-                    rv_posts.append(post)
+                blog.parse_form(form, isZip=True)
+                blog.post_stories()
+                posts = blog.posted_posts
         else:
-            form = FileUploadForm()
+            form = blog.form()
             posts = None
     else:
         post = form = categories = pub_date = None
         
     return direct_to_template(request, 'batch_upload.html', 
         {'config': config, 'categories': categories,
-        'form': form, 'posts': rv_posts, 'pub_date': pub_date, })
+        'form': form, 'posts': posts, 'pub_date': pub_date, })
         
 def single_upload_file_info(request):
-    post = form = categories = pub_date = None
+    posts = form = categories = pub_date = None
     config = lookup_settings(request)
-    
+
     if config: 
-        blog = pyblog.WordPress(config.cms_url, config.cms_user, 
-                config.cms_pass)
+        blog = CMSUtility(config)
         categories = blog.get_categories()
+
         if request.method == 'POST':
-            form = FileUploadForm(request.POST, request.FILES)
+            form = blog.form(request.POST, request.FILES)
             file_name = None
             if form.is_valid():
-                post_file = form.cleaned_data['post_file']
-                layout = form.cleaned_data['layout']
-                post = process_file(post_file, layout=layout)
-                
-                if 'image_file' in form.cleaned_data:
-                    if form.cleaned_data['image_file']:
-                        image_file = form.cleaned_data['image_file']
-                        img = upload_image(blog, image_file)
-                        post['description'] += '<br/><img src="' + img['url'] + '"/>'                
-                
-                pub_date = form.cleaned_data['date']
-                post['dateCreated'] = xmlrpclib.DateTime(
-                    time.mktime(pub_date.timetuple()))
-                post['mt_keywords'] = form.cleaned_data['tags']
-                post['categories'] = [form.cleaned_data['category']]
-                
-                rv = new_post(blog, post)
-                post = blog.get_post(rv)
+                blog.parse_form(form)
+                blog.post_stories()
+                posts = blog.posted_posts
         else:
-            form = FileUploadForm()
-            post = None
+            form = blog.form()
+            posts = None
     else:
-        post = form = categories = pub_date = None
+        posts = form = categories = pub_date = None
         
     return direct_to_template(request, 'single_upload_file_info.html', 
         {'config': config, 'categories': categories,
-        'form': form, 'post': post, 'pub_date': pub_date, 
+        'form': form, 'posts': posts, 'pub_date': pub_date, 
         'layouts': LAYOUTS})
         
 def batch_upload_hierarchy(request):
@@ -178,61 +136,64 @@ def batch_upload_hierarchy(request):
     config = lookup_settings(request)
 
     if config:
-        blog = pyblog.WordPress(config.cms_url, config.cms_user, 
-                config.cms_pass)
+        blog = CMSUtility(config)
         categories = blog.get_categories()
 
         if request.method == 'POST':
-            form = FileUploadForm(request.POST, request.FILES)
+            form = blog.form(request.POST, request.FILES)
             file_name = None
             if form.is_valid():
-                post_file = form.cleaned_data['post_file']
-                layout = form.cleaned_data['layout']
-                dir_structure = form.cleaned_data['dir_structure']
-                posts = process_zip_file(post_file, layout=layout, 
-                    dir_structure=dir_structure)
-                    
-                pub_date = form.cleaned_data['date']
-                dateCreated = xmlrpclib.DateTime(
-                    time.mktime(pub_date.timetuple()))
-                mt_keywords = form.cleaned_data['tags']
-                category = form.cleaned_data['category']
+                blog.parse_form(form, isZip=True, isHierarchy=True)
+                blog.post_stories()
+                posts = blog.posted_posts
+
+#                post_file = form.cleaned_data['post_file']
+#                layout = form.cleaned_data['layout']
+#                dir_structure = form.cleaned_data['dir_structure']
+#                posts = process_zip_file(post_file, layout=layout, 
+#                    dir_structure=dir_structure)
+#                    
+#                pub_date = form.cleaned_data['date']
+#                dateCreated = xmlrpclib.DateTime(
+#                    time.mktime(pub_date.timetuple()))
+#                mt_keywords = form.cleaned_data['tags']
+#                category = form.cleaned_data['category']
 
 
-                rv_posts = []
-                for cms_post in posts:
-                    if 'category' in cms_post:
-                        post_category = [cms_post['category']]
-                        cat_id = 0
-                        for cat in categories:
-                            if cat['categoryName'] == cms_post['category']:
-                                cat_id = int(cat['categoryId'])
-                        if not cat_id:
-                            cat_id = blog.new_category(
-                                {'name': cms_post['category'],
-                                'slug': cms_post['category'].replace(' ', '-'),
-                                'parent_id': 0, 
-                                'description': cms_post['category']})
-                        cms_post['categories'] = [cms_post['category']]
-                    else: 
-                        cms_post['categories'] = [category]
-                        
-                    cms_post['mt_keywords'] = mt_keywords
-                    cms_post['dateCreated'] = dateCreated
-                    
-                    rv = new_post(blog, cms_post)
-                    if rv:
-                        post = blog.get_post(rv)            
-                        rv_posts.append(post)
+#                rv_posts = []
+#                for cms_post in posts:
+#                    if 'category' in cms_post:
+#                        post_category = [cms_post['category']]
+#                        cat_id = 0
+#                        for cat in categories:
+#                            if cat['categoryName'] == cms_post['category']:
+#                                cat_id = int(cat['categoryId'])
+#                        if not cat_id:
+#                            cat_id = blog.new_category(
+#                                {'name': cms_post['category'],
+#                                'slug': cms_post['category'].replace(' ', '-'),
+#                                'parent_id': 0, 
+#                                'description': cms_post['category']})
+#                        cms_post['categories'] = [cms_post['category']]
+#                    else: 
+#                        cms_post['categories'] = [category]
+#                        
+#                    cms_post['mt_keywords'] = mt_keywords
+#                    cms_post['dateCreated'] = dateCreated
+#                    
+#                    rv = new_post(blog, cms_post)
+#                    if rv:
+#                        post = blog.get_post(rv)            
+#                        rv_posts.append(post)
         else:
-            form = FileUploadForm()
+            form = blog.form()
             posts = None
     else:
         post = form = categories = pub_date = None
         
     return direct_to_template(request, 'batch_upload_hierarchy.html', 
         {'config': config, 'categories': categories,
-        'form': form, 'posts': rv_posts, 'pub_date': pub_date, 
+        'form': form, 'posts': posts, 'pub_date': pub_date, 
         'layouts': LAYOUTS, 'dir_structures': DIR_STRUCTURES, })
 
 def server_error(request, template_name='500.html'):

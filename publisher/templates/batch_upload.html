@@ -23,11 +23,6 @@
 {% if posts %}
 {% for post in posts %}
 <h3>File posted.</h3>
-<b>Title:</b> <pre>{{ post.title }}</pre>
-<b>Description:</b><p>{{ post.description|safe }}</p>
-<b>Category:</b><pre>{{ post.categories.0 }}</pre>
-<b>Tags:</b><pre>{{ post.mt_keywords }}</pre>
-<p>Pub Date:</b><pre>{{ pub_date }}</pre>
 <b>Permalink</b><pre><a href="{{ post.permaLink }}">{{ post.permaLink }}</a></pre>
 {% endfor %}
 {% else %}
@@ -42,6 +37,7 @@
         <label for="id_post_file">Zip File:</label>
         <input id="post_file" name="post_file" type="file"/>
     </div>
+    {% if categories %}
     <div class="fieldWrapper">
         {{ form.category.errors }}
         <label for="id_category">Category:</label>
@@ -51,6 +47,7 @@
             {% endfor %}
         </select>
     </div>
+    {% endif %}
     <div class="fieldWrapper">
         {{ form.status.errors }}
         <label for="id_status">Status:</label>
@@ -59,6 +56,7 @@
             <option>Draft</option>
         </select>
     </div>
+    {% ifequal config.cms_type 'WP' %}
     <div class="fieldWrapper">
         {{ form.tags.errors }}
         <label for="id_tags">Tags:</label>
@@ -69,6 +67,7 @@
         <label for="id_date">Pub Date:</label>
         <input id="date" name="date" type="text" value='{% now "m/d/Y" %}'/> 
     </div>
+    {% endifequal %}
     <input type="hidden" name="layout" value="default"/>
     <input type="hidden" name="dir_structure" value="default"/>
     <input type="submit" value="Upload File"/>

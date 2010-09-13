@@ -2,7 +2,10 @@ from django.conf import settings
 from django.utils.encoding import smart_unicode
 
 from models import DocumentsProcessed
+from poster import prepare_story
 
+import pyblog
+import time
 import models
 import zipfile
 import tempfile
@@ -264,9 +267,15 @@ def geocode(address="", city="", state="CA"):
 
     return coords
     
-def new_post(blog, post):
+def new_wp_post(config, post):
+    print 'p:',post
     if not post['title'] and not post['description']:
         return False
+
+    blog = pyblog.WordPress(config.cms_url, config.cms_user, 
+        config.cms_pass)
+    
+
     
     address = post.pop('address', None)
     latitude = post.pop('latitude', None)
@@ -279,7 +288,8 @@ def new_post(blog, post):
     
     if latitude and longitude:
         add_coords(blog, rv, latitude, longitude)
-    return rv
+    print post
+    return post
     
 def add_coords(blog, post_id, latitude, longitude):
         try:
@@ -308,3 +318,7 @@ def upload_image(blog, image_file):
     os.unlink(tmp_file_name)
     return img
     
+def create_post(config, post):
+    story = prepare_story(config, post)
+    if config.cms_type == 'WP': 
+        return new_wp_post(config, story)
