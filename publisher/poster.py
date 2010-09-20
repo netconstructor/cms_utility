@@ -25,6 +25,12 @@ class CMSUtility(object):
             self._pyblog = pyblog.MetaWeblog(config.cms_url, config.cms_user,
                 config.cms_pass, appkey='')
             self.form = CMSUploadForm
+        elif config.cms_type == 'MT':
+            self._pyblog = pyblog.MovableType(config.cms_url, config.cms_user,
+                config.cms_pass)
+            blogs = self._pyblog.get_users_blogs()
+            self.blogid = blogs[0]['blogid']
+            self.form = CMSUploadForm
         else:
             raise pyblog.BlogError('Unsupported Blog Type')
     
