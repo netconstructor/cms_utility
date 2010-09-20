@@ -33,7 +33,7 @@ class Settings(models.Model):
         ('BL', '* Blogger'), ('WM', '* WikiMedia'),)
     email = models.EmailField()
     cms_type = models.CharField(max_length=2, choices=CMS_CHOICES)
-    cms_url = models.URLField()
+    cms_url = models.URLField(verify_exists=False)
     cms_user = models.CharField(max_length=75)
     cms_pass = models.CharField(max_length=75)
     
