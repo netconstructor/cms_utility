@@ -29,7 +29,7 @@ DIR_STRUCTURES = (
 # Create your models here.
 class Settings(models.Model):
     CMS_CHOICES = (('WP', 'Wordpress'), ('DR', 'Drupal'), 
-        ('MT', '* Moveable Type'), 
+        ('MT', 'Moveable Type'), 
         ('BL', '* Blogger'), ('WM', '* WikiMedia'),)
     email = models.EmailField()
     cms_type = models.CharField(max_length=2, choices=CMS_CHOICES)
