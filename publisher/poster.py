@@ -31,12 +31,27 @@ class CMSUtility(object):
             blogs = self._pyblog.get_users_blogs()
             self.blogid = blogs[0]['blogid']
             self.form = CMSUploadForm
+        elif config.cms_type == 'BL':
+            self._pyblog = pyblog.Blogger(config.cms_user, config.cms_pass)
+            self.blogid = self._pyblog.blog_id
+            self.form = CMSUploadForm
         else:
             raise pyblog.BlogError('Unsupported Blog Type')
     
     def get_categories(self):
         return self._pyblog.get_categories(self.blogid)
-
+    
+    def get_links(self):
+        links = []
+        for post in self.posted_posts:
+            if type(post) == dict and 'permaLink' in post:
+                links.append(post['permaLink'])
+            elif getattr(post, 'link', None):
+                links.append(post.link[-1].href)            
+            else:
+                pass
+        return links
+                
     def upload_image(self, image_file, path):
         tmp_file_name = path + os.path.sep + image_file.name
         tmp_file = open(tmp_file_name, 'w')
@@ -99,16 +114,17 @@ class CMSUtility(object):
         if 'category' in post:
             self.add_category(post_id, post['category'])
         posted_post = self._pyblog.get_post(post_id)
+        
         self.posted_posts.append(posted_post)
-      
-        if address:
+        
+        if address and self.config.cms_type == 'WP':
             try:
                 idx = self._pyblog.methods.index('wpgeo.setCoords')
                 coords = self._pyblog.server.wpgeo.setCoords(post_id, 
                     self._pyblog.username, self._pyblog.password, 
                     {'_wp_geo_latitude': latitude, 
                     '_wp_geo_longitude': longitude})
-            except ValueError:
+            except ValueError, AttributeError:
                 pass
         increase_docs(1)
       

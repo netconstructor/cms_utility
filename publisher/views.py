@@ -66,7 +66,7 @@ def single_upload(request):
             if form.is_valid():
                 blog.parse_form(form)
                 blog.post_stories()
-                posts = blog.posted_posts
+                posts = blog.get_links()
         else:
             form = blog.form()
             posts = pub_date = None
@@ -92,7 +92,7 @@ def batch_upload(request):
             if form.is_valid():
                 blog.parse_form(form, isZip=True)
                 blog.post_stories()
-                posts = blog.posted_posts
+                posts = blog.get_links()
         else:
             form = blog.form()
             posts = None
@@ -117,7 +117,7 @@ def single_upload_file_info(request):
             if form.is_valid():
                 blog.parse_form(form)
                 blog.post_stories()
-                posts = blog.posted_posts
+                posts = blog.get_links()
         else:
             form = blog.form()
             posts = None
@@ -143,7 +143,7 @@ def batch_upload_hierarchy(request):
             if form.is_valid():
                 blog.parse_form(form, isZip=True, isHierarchy=True)
                 blog.post_stories()
-                posts = blog.posted_posts
+                posts = blog.get_links()
 
 #                post_file = form.cleaned_data['post_file']
 #                layout = form.cleaned_data['layout']

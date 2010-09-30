@@ -24,7 +24,7 @@
 {% if posts %}
 {% for post in posts %}
 <h3>File posted.</h3>
-<b>Permalink</b><pre><a href="{{ post.permaLink }}">{{ post.permaLink }}</a></pre>
+<b>Permalink</b><pre><a href="{{ post }}">{{ post }}</a></pre>
 {% endfor %}
 {% else %}
 {% if not config %}

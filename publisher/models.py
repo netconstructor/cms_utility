@@ -30,10 +30,10 @@ DIR_STRUCTURES = (
 class Settings(models.Model):
     CMS_CHOICES = (('WP', 'Wordpress'), ('DR', 'Drupal'), 
         ('MT', 'Moveable Type'), 
-        ('BL', '* Blogger'), ('WM', '* WikiMedia'),)
+        ('BL', 'Blogger'), ('WM', '* WikiMedia'),)
     email = models.EmailField()
     cms_type = models.CharField(max_length=2, choices=CMS_CHOICES)
-    cms_url = models.URLField(verify_exists=False)
+    cms_url = models.URLField(verify_exists=False, default='http://www.blogger.com/')
     cms_user = models.CharField(max_length=75)
     cms_pass = models.CharField(max_length=75)
     
