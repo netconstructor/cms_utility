@@ -109,10 +109,12 @@ class CMSUtility(object):
         address = post.pop('address', None) 
         latitude = post.pop('latitude', None)
         longitude = post.pop('longitude', None)
-      
+        
         post_id = self._pyblog.new_post(post, True, self.blogid)
+        
         if 'category' in post:
             self.add_category(post_id, post['category'])
+            
         posted_post = self._pyblog.get_post(post_id)
         
         self.posted_posts.append(posted_post)
@@ -177,7 +179,7 @@ def process_file(post_file, layout='default', is_zipfile=False):
         data = rtf_file(post_file, file_name, is_zipfile)
     else: 
         data = None
-
+    
     return parse_file(data, file_name, layout)
 
 def parse_file(data, file_name, layout):
@@ -232,7 +234,6 @@ def parse_file(data, file_name, layout):
             post['latitude'] = address['latitude']
             post['longitude'] = address['longitude']
 
-
     return post        
     
 def text_file(post_file, file_name, is_zipfile=False):
@@ -241,14 +242,17 @@ def text_file(post_file, file_name, is_zipfile=False):
         lines = post_file.read()
         post_file.close()
     else:
-        lines = smart_unicode(post_file.read(), encoding='mac_roman', errors='replace')
+        lines = smart_unicode(post_file.read(), encoding='mac_roman')
     if is_zipfile:
         os.unlink(file_name)
-
+    
     lines = lines.replace('\n\n', '\n')
     lines = lines.replace('\r\n', '\n')
     lines = lines.replace('\r', '\n')
-    lines = unicodedata.normalize('NFKD', lines).encode('ascii', 'ignore')
+   
+    # weird bug/char
+    lines = lines.replace('\x07', '')
+   # lines = unicodedata.normalize('NFKD', lines).encode('ascii', 'ignore')
 
     return lines.splitlines()
 
