@@ -3,8 +3,17 @@ from models import Settings
 
 class SettingsForm(forms.ModelForm):
     cms_pass = forms.CharField(widget=forms.PasswordInput())
+
     class Meta:
         model = Settings
+
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.id:
+            self.fields['email'].widget.attrs['readonly'] = True
+
 
 class CMSUploadForm(forms.Form):
     post_file = forms.FileField()
