@@ -29,13 +29,11 @@ def get_messages(request):
 
 def lookup_settings(request):
     config = None
-    if 'cms_email' in request.session:
+    if request.user:
         try:
-            config = models.Settings.objects.get(email=request.session['cms_email'])
+            config = models.Settings.objects.get(email=request.user.email)
         except models.Settings.DoesNotExist:
             config = None
-            del request.session['cms_email']
-
     return config
 
 def delete_settings(email):
