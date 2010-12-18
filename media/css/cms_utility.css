@@ -91,3 +91,12 @@ a:hover {
     text-align: right;
     font-size: 70%;
 }
+
+.right {
+    float: right;
+}
+
+a.small {
+    font-size: 90%;
+    font-weight: bold;
+}
