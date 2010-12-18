@@ -1,4 +1,4 @@
-import os
+import os, sys
 from socket import gethostname
 
 ROOT_PATH = os.path.dirname(__file__)
@@ -19,3 +19,8 @@ elif gethostname() == 'debian':
     ROOT_URL = 'http://debian:8000/'
 else:
     pass
+    
+if not os.path.isdir(TEMP_FILES):
+    print 'Please create directory for temp files:'
+    print '\t' + TEMP_FILES
+    sys.exit(0)
