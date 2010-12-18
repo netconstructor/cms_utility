@@ -1,0 +1,8 @@
+Thank you for signing up on the Brainstorm Application.
+
+You have {{ expiration_days }} to activate your account.
+
+You can activate your account by clicking the URL below:
+
+{{ settings.SITEURL }}/accounts/activate/{{ activation_key }}/
+

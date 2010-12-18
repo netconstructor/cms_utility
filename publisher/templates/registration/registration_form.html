@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post" action="">
+<table>
+	<tr>
+		<td>{{ form.username.label|title }}</td>
+		<td>{{ form.username }}</td>
+		<td class="error">{% if form.username.errors %}{{ form.username.errors.0 }}{% endif %}</td>
+	</tr>
+	<tr>
+		<td>{{ form.firstname.label|title }}</td>
+		<td>{{ form.firstname }}</td>
+		<td class="error">{% if form.firstname.errors %}{{ form.firstname.errors.0 }}{% endif %}</td>
+	</tr>	
+	<tr>
+		<td>{{ form.email.label|title }}</td>
+		<td>{{ form.email }}</td>
+		<td class="error">{% if form.email.errors %}{{ form.email.errors.0 }}{% endif %}</td>
+	</tr>
+	<tr>
+		<td>{{ form.password1.label|title }}</td>
+		<td>{{ form.password1 }}</td>
+		<td class="error">{% if form.password1.errors %}{{ form.password1.errors.0 }}{% endif %}</td>
+	</tr>
+	<tr>
+		<td>{{ form.password2.label|title }}</td>
+		<td>{{ form.password2 }}</td>
+		<td class="error">{% if form.password2.errors %}{{ form.password2.errors.0 }}{% endif %}</td>
+	</tr>
+	<tr>
+		<td colspan="2"><input type="submit"/></td>
+	</tr>
+</table>
+</form>
+
+{% endblock %}
