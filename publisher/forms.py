@@ -6,13 +6,8 @@ class SettingsForm(forms.ModelForm):
 
     class Meta:
         model = Settings
+        exclude = ('email', )
 
-
-    def __init__(self, *args, **kwargs):
-        super(SettingsForm, self).__init__(*args, **kwargs)
-        instance = getattr(self, 'instance', None)
-        if instance and instance.id:
-            self.fields['email'].widget.attrs['readonly'] = True
 
 
 class CMSUploadForm(forms.Form):
