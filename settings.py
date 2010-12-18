@@ -5,8 +5,10 @@ from localsettings import *
 
 if gethostname() == 'debian':
     DEBUG = True
+    SITEURL= 'http://debian:8000'
 else:
     DEBUG = False
+    SITEURL = 'http://apps.joeboydston.com/cms_utility'
     
 TEMPLATE_DEBUG = DEBUG
 
@@ -95,6 +97,17 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.humanize',
+    'registration',
     'cms_utility.publisher',
 )
+
+ACCOUNT_ACTIVATION_DAYS = 7
+LOGIN_REDIRECT_URL = SITEURL
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'cms_utility_demo@d0nk.com'
+EMAIL_HOST_PASSWORD = 'cms_demo'
+EMAIL_PORT = 587
+
 
