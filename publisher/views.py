@@ -23,6 +23,7 @@ def index(request):
 def cms_settings(request):
     config = None
     message = get_messages(request)
+    config = lookup_settings(request)
     
     if request.method == 'POST':
         form = SettingsForm(request.POST)
@@ -35,9 +36,8 @@ def cms_settings(request):
             request.session['cms_email'] = config.email
             return HttpResponseRedirect(settings.ROOT_URL+'options/')
     else:
-        form = SettingsForm()
+        form = SettingsForm(instance=config)
     
-    config = lookup_settings(request)
     
     return direct_to_template(request, 'settings.html', 
         {'config': config, 'message': message, 'form': form, })
