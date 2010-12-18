@@ -17,8 +17,16 @@
     </div>
     <div id="stats">
         Number of Users: {{ num_users|intcomma }}<br/>
-        Documents Processed: {{ doc_count|intcomma }}
+        Documents Processed: {{ doc_count|intcomma }}<br/>
+        {% if user.is_authenticated %}
+			User: {{ user.first_name }} {{ user.last_name}} ({{ user.username }})<br/>
+			<a class="small" href="{{ settings.SITEURL }}/accounts/password/change/">Change Password</a> |	 <a class="small" href="{{ settings.SITEURL }}/accounts/logout/">Logout</a>
+		{% else %}
+			<a class="small" href="{{ settings.SITEURL }}/accounts/login/">Login</a> | <a class="small" href="{{ settings.SITEURL }}/accounts/register/">Register</a>
+		{% endif %}
+		
     </div>
+
     {% block subheader %}
     <div id="sub-header">
         <ul>
@@ -26,7 +34,13 @@
             <li><a href="{{ settings.ROOT_URL }}batch_upload/">Batch Upload</a></li>
             <li><a href="{{ settings.ROOT_URL }}single_upload/">Single Upload</a></li>
         </ul>
+        
     </div>
+
+    <div class="right">
+	</div>
+
+
     {% endblock %}
     <div id="content">
         {% block content %}{% endblock %}
