@@ -100,3 +100,19 @@ a.small {
     font-size: 90%;
     font-weight: bold;
 }
+
+#id_cms_url, #id_email {
+    width: 350px;
+}
+
+#id_cms_user, #id_cms_pass {
+    width: 100px;
+}
+
+#rw_settings {
+    display: none;
+}
+
+#id_cms_pass {
+    
+}
