@@ -13,6 +13,7 @@ from models import Settings, LAYOUTS, DIR_STRUCTURES, DocumentsProcessed
 from forms import FileUploadForm, SettingsForm
 from publisher import *
 from publisher.poster import CMSUtility
+from pprint import pprint
 
 def index(request):
     config = lookup_settings(request)
@@ -28,10 +29,11 @@ def cms_settings(request):
     if request.method == 'POST':
         form = SettingsForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
+            email = request.user.email
             delete_settings(email=email)
-            
             config = form.save()
+            config.email = request.user.email
+            config.save()
             message = "Settings saved."
             request.session['cms_email'] = config.email
             return HttpResponseRedirect(settings.ROOT_URL+'options/')
