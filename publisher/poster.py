@@ -387,6 +387,7 @@ def process_zip_file(post_file, form, layout="default", dir_structure='default')
                     pass
             elif dir_structure == 'default':
                 post['category'] = form.cleaned_data['category']
+                post['mt_keywords'] = form.cleaned_data['tags']
             else:
                 pass
 
