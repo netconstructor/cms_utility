@@ -107,8 +107,9 @@ LOGIN_URL = SITEURL + '/accounts/login/'
 
 #EMAIL_USE_TLS = True
 #EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'cms_utility_demo@joeboydston.com '
+#EMAIL_HOST_USER = 'cms_utility_demo@joeboydston.com '
 #EMAIL_HOST_PASSWORD = 'cms_demo'
 #EMAIL_PORT = 587
 
+DEFAULT_FROM_EMAIL = cms_utility_demo@joeboydston.com'
 
