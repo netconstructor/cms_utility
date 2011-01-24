@@ -34,6 +34,8 @@ def lookup_settings(request):
             config = models.Settings.objects.get(email=request.user.email)
         except models.Settings.DoesNotExist:
             config = None
+        except AttributeError:
+            config = None
     return config
 
 def delete_settings(email):
