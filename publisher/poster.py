@@ -82,19 +82,31 @@ class CMSUtility(object):
                 dir_structure=dir_structure)
         else:
             post = process_file(post_file, layout=layout)
-        
+            image_id = None
             if 'image_file' in form.cleaned_data:
                 if form.cleaned_data['image_file']:
                     image_file = form.cleaned_data['image_file']
                     img = self.upload_image(image_file, settings.TEMP_FILES)
                     post['description'] += '<br/><img src="' + img['url'] + '"/>'
-
+                    
+                    # get image id
+                    try:
+                        idx = self._pyblog.methods.index('wpfeatured.getImageId')
+                        image_id = self._pyblog.server.wpfeatured.getImageId(
+                            img['url'], 
+                            self._pyblog.username, self._pyblog.password)
+                    except ValueError, AttributeError:
+                        pass       
+                    
+        
             if self.config.cms_type == 'WP':
                 pub_date = form.cleaned_data['date']
                 post['dateCreated'] = xmlrpclib.DateTime(
                     time.mktime(pub_date.timetuple()))
                 post['mt_keywords'] = form.cleaned_data['tags']
                 post['categories'] = [form.cleaned_data['category']]
+                
+            post['image_id'] = image_id
             
             self.posts.append(post)
         
@@ -110,6 +122,7 @@ class CMSUtility(object):
         address = post.pop('address', None) 
         latitude = post.pop('latitude', None)
         longitude = post.pop('longitude', None)
+        image_id = post.pop('image_id', None)
         
         post_id = self._pyblog.new_post(post, True, self.blogid)
         
@@ -129,6 +142,15 @@ class CMSUtility(object):
                     '_wp_geo_longitude': longitude})
             except ValueError, AttributeError:
                 pass
+        
+        if image_id and self.config.cms_type == 'WP':
+            try:
+                idx = self._pyblog.methods.index('wpfeatured.setFeatured')
+                featured = self._pyblog.server.wpfeatured.setFeatured(post_id, 
+                image_id, self._pyblog.username, self._pyblog.password)
+            except ValueError, AttributeError:
+                pass
+                
         increase_docs(1)
       
     def add_category(self, post_id, category):
