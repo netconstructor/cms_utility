@@ -78,7 +78,7 @@ class CMSUtility(object):
         dir_structure = form.cleaned_data['dir_structure']
         
         if isZip:
-            self.posts = process_zip_file(post_file, layout=layout, 
+            self.posts = process_zip_file(post_file, form, layout=layout, 
                 dir_structure=dir_structure)
         else:
             post = process_file(post_file, layout=layout)
@@ -98,6 +98,7 @@ class CMSUtility(object):
             
             self.posts.append(post)
         
+
     def post_stories(self):
         for post in self.posts:
             self.create_story(post)
@@ -345,7 +346,7 @@ def increase_docs(how_many=1):
     dp.total += how_many
     dp.save()
     
-def process_zip_file(post_file, layout="default", dir_structure='default'):
+def process_zip_file(post_file, form, layout="default", dir_structure='default'):
     file_name = post_file.name
     directory = tempfile.mkdtemp(dir=settings.TEMP_FILES)
 
@@ -384,6 +385,10 @@ def process_zip_file(post_file, layout="default", dir_structure='default'):
                     post['category'] = info.filename.split(os.path.sep)[-2]
                 except IndexError:
                     pass
+            elif dir_structure == 'default':
+                post['category'] = form.cleaned_data['category']
+            else:
+                pass
 
             if post['title'] and post['description']:
                 posts.append(post)
