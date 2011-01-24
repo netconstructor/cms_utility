@@ -111,5 +111,5 @@ LOGIN_URL = SITEURL + '/accounts/login/'
 #EMAIL_HOST_PASSWORD = 'cms_demo'
 #EMAIL_PORT = 587
 
-DEFAULT_FROM_EMAIL = cms_utility_demo@joeboydston.com'
+DEFAULT_FROM_EMAIL = 'cms_utility_demo@joeboydston.com'
 
